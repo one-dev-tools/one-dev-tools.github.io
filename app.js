@@ -555,23 +555,11 @@ function decodeJWT() {
         
         // Decode header
         const header = JSON.parse(atob(parts[0]));
-        document.getElementById('jwt-header').textContent = JSON.stringify(header, null, 2);
+        document.getElementById('jwt-header').innerHTML = formatJWTWithTooltips(header, 'header');
         
         // Decode payload
         const payload = JSON.parse(atob(parts[1]));
-        
-        // Add human-readable dates if present
-        if (payload.exp) {
-            payload.exp_readable = new Date(payload.exp * 1000).toISOString();
-        }
-        if (payload.iat) {
-            payload.iat_readable = new Date(payload.iat * 1000).toISOString();
-        }
-        if (payload.nbf) {
-            payload.nbf_readable = new Date(payload.nbf * 1000).toISOString();
-        }
-        
-        document.getElementById('jwt-payload').textContent = JSON.stringify(payload, null, 2);
+        document.getElementById('jwt-payload').innerHTML = formatJWTWithTooltips(payload, 'payload');
         
         // Signature (cannot be decoded)
         document.getElementById('jwt-signature').textContent = parts[2];
@@ -606,6 +594,79 @@ function decodeBase64() {
     } catch (error) {
         showNotification('Decoding error: ' + error.message, 'error');
     }
+}
+
+// Format JWT with tooltips for known fields
+// Format JWT with tooltips for known fields
+function formatJWTWithTooltips(obj, section) {
+    const knownFields = {
+        // Standard JWT claims
+        'iss': 'Issuer - identifies the principal that issued the JWT',
+        'sub': 'Subject - identifies the principal that is the subject of the JWT',
+        'aud': 'Audience - identifies the recipients that the JWT is intended for',
+        'exp': 'Expiration Time - identifies the expiration time on or after which the JWT must not be accepted',
+        'nbf': 'Not Before - identifies the time before which the JWT must not be accepted',
+        'iat': 'Issued At - identifies the time at which the JWT was issued',
+        'jti': 'JWT ID - provides a unique identifier for the JWT',
+        
+        // Common header fields
+        'alg': 'Algorithm - identifies the cryptographic algorithm used to secure the JWT',
+        'typ': 'Type - declares the media type of the JWT',
+        'kid': 'Key ID - hint indicating which key was used to secure the JWT',
+        'cty': 'Content Type - declares the media type of the secured content',
+        
+        // Common custom claims
+        'scope': 'Scope - space-separated list of scope values',
+        'roles': 'Roles - user roles or permissions',
+        'email': 'Email - user email address',
+        'name': 'Name - user full name',
+        'given_name': 'Given Name - user first name',
+        'family_name': 'Family Name - user last name',
+        'preferred_username': 'Preferred Username - shorthand name by which the user wishes to be referred'
+    };
+    
+    const timestampFields = ['exp', 'nbf', 'iat'];
+    
+    let formatted = '{\n';
+    const entries = Object.entries(obj);
+    
+    entries.forEach(([key, value], index) => {
+        const isLast = index === entries.length - 1;
+        const indent = '  ';
+        
+        let valueStr = JSON.stringify(value);
+        let tooltip = '';
+        
+        // Add tooltip for known fields
+        if (knownFields[key]) {
+            tooltip = knownFields[key];
+            
+            // For timestamp fields, add human-readable date to tooltip
+            if (timestampFields.includes(key) && typeof value === 'number') {
+                const date = new Date(value * 1000);
+                const humanReadable = date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZoneName: 'short'
+                });
+                tooltip += '&#13;&#13;📅 ' + humanReadable;
+            }
+        }
+        
+        if (tooltip) {
+            const escapedTooltip = tooltip.replace(/"/g, '&quot;');
+            formatted += `${indent}<span class="jwt-field" title="${escapedTooltip}">"${key}"</span>: ${valueStr}${isLast ? '' : ','}\n`;
+        } else {
+            formatted += `${indent}"${key}": ${valueStr}${isLast ? '' : ','}\n`;
+        }
+    });
+    
+    formatted += '}';
+    return formatted;
 }
 
 // Hash Generator
@@ -653,9 +714,20 @@ function generateMultipleUUIDs() {
 // Timestamp Converter
 function updateCurrentTime() {
     const now = new Date();
+    const userLocale = navigator.language || 'en-US';
+    
     document.getElementById('current-unix').value = Math.floor(now.getTime() / 1000);
     document.getElementById('current-unix-ms').value = now.getTime();
     document.getElementById('current-iso').value = now.toISOString();
+    document.getElementById('current-locale').value = now.toLocaleString(userLocale, {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        timeZoneName: 'short'
+    });
 }
 
 function convertTimestamp() {
@@ -676,14 +748,45 @@ function convertTimestamp() {
             throw new Error('Invalid timestamp');
         }
         
+        // Get browser locale
+        const userLocale = navigator.language || 'en-US';
+        
         output.innerHTML = `
-            <strong>Unix Timestamp (seconds):</strong> ${Math.floor(date.getTime() / 1000)}<br>
-            <strong>Unix Timestamp (milliseconds):</strong> ${date.getTime()}<br>
-            <strong>ISO 8601:</strong> ${date.toISOString()}<br>
-            <strong>UTC:</strong> ${date.toUTCString()}<br>
-            <strong>Local:</strong> ${date.toLocaleString()}<br>
-            <strong>Date:</strong> ${date.toLocaleDateString()}<br>
-            <strong>Time:</strong> ${date.toLocaleTimeString()}
+            <div class="timestamp-section">
+                <h4>Timestamps</h4>
+                <strong>Unix Timestamp (seconds):</strong> ${Math.floor(date.getTime() / 1000)}<br>
+                <strong>Unix Timestamp (milliseconds):</strong> ${date.getTime()}<br>
+            </div>
+            <div class="timestamp-section">
+                <h4>Standard Formats</h4>
+                <strong>ISO 8601:</strong> ${date.toISOString()}<br>
+                <strong>UTC:</strong> ${date.toUTCString()}<br>
+            </div>
+            <div class="timestamp-section">
+                <h4>Browser Locale (${userLocale})</h4>
+                <strong>Full Date & Time:</strong> ${date.toLocaleString(userLocale, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZoneName: 'short'
+                })}<br>
+                <strong>Long Date:</strong> ${date.toLocaleDateString(userLocale, {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                })}<br>
+                <strong>Short Date:</strong> ${date.toLocaleDateString(userLocale)}<br>
+                <strong>Time:</strong> ${date.toLocaleTimeString(userLocale)}<br>
+                <strong>Time (24h):</strong> ${date.toLocaleTimeString(userLocale, { hour12: false })}<br>
+            </div>
+            <div class="timestamp-section">
+                <h4>Relative Time</h4>
+                <strong>From Now:</strong> ${getRelativeTime(date)}
+            </div>
         `;
     } catch (error) {
         output.innerHTML = `<span style="color: var(--error-color);">Error: ${error.message}</span>`;
@@ -705,14 +808,72 @@ function convertDateToTimestamp() {
             throw new Error('Invalid date');
         }
         
+        // Get browser locale
+        const userLocale = navigator.language || 'en-US';
+        
         output.innerHTML = `
-            <strong>Unix Timestamp (seconds):</strong> ${Math.floor(date.getTime() / 1000)}<br>
-            <strong>Unix Timestamp (milliseconds):</strong> ${date.getTime()}<br>
-            <strong>ISO 8601:</strong> ${date.toISOString()}<br>
-            <strong>UTC:</strong> ${date.toUTCString()}
+            <div class="timestamp-section">
+                <h4>Timestamps</h4>
+                <strong>Unix Timestamp (seconds):</strong> ${Math.floor(date.getTime() / 1000)}<br>
+                <strong>Unix Timestamp (milliseconds):</strong> ${date.getTime()}<br>
+            </div>
+            <div class="timestamp-section">
+                <h4>Standard Formats</h4>
+                <strong>ISO 8601:</strong> ${date.toISOString()}<br>
+                <strong>UTC:</strong> ${date.toUTCString()}<br>
+            </div>
+            <div class="timestamp-section">
+                <h4>Browser Locale (${userLocale})</h4>
+                <strong>Full Date & Time:</strong> ${date.toLocaleString(userLocale, {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    timeZoneName: 'short'
+                })}
+            </div>
         `;
     } catch (error) {
         output.innerHTML = `<span style="color: var(--error-color);">Error: ${error.message}</span>`;
+    }
+}
+
+// Helper function to get relative time
+function getRelativeTime(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffSec = Math.floor(diffMs / 1000);
+    const diffMin = Math.floor(diffSec / 60);
+    const diffHour = Math.floor(diffMin / 60);
+    const diffDay = Math.floor(diffHour / 24);
+    const diffMonth = Math.floor(diffDay / 30);
+    const diffYear = Math.floor(diffDay / 365);
+    
+    if (diffMs < 0) {
+        // Future date
+        const absDiffSec = Math.abs(diffSec);
+        const absDiffMin = Math.abs(diffMin);
+        const absDiffHour = Math.abs(diffHour);
+        const absDiffDay = Math.abs(diffDay);
+        const absDiffMonth = Math.abs(diffMonth);
+        const absDiffYear = Math.abs(diffYear);
+        
+        if (absDiffSec < 60) return `in ${absDiffSec} second${absDiffSec !== 1 ? 's' : ''}`;
+        if (absDiffMin < 60) return `in ${absDiffMin} minute${absDiffMin !== 1 ? 's' : ''}`;
+        if (absDiffHour < 24) return `in ${absDiffHour} hour${absDiffHour !== 1 ? 's' : ''}`;
+        if (absDiffDay < 30) return `in ${absDiffDay} day${absDiffDay !== 1 ? 's' : ''}`;
+        if (absDiffMonth < 12) return `in ${absDiffMonth} month${absDiffMonth !== 1 ? 's' : ''}`;
+        return `in ${absDiffYear} year${absDiffYear !== 1 ? 's' : ''}`;
+    } else {
+        // Past date
+        if (diffSec < 60) return `${diffSec} second${diffSec !== 1 ? 's' : ''} ago`;
+        if (diffMin < 60) return `${diffMin} minute${diffMin !== 1 ? 's' : ''} ago`;
+        if (diffHour < 24) return `${diffHour} hour${diffHour !== 1 ? 's' : ''} ago`;
+        if (diffDay < 30) return `${diffDay} day${diffDay !== 1 ? 's' : ''} ago`;
+        if (diffMonth < 12) return `${diffMonth} month${diffMonth !== 1 ? 's' : ''} ago`;
+        return `${diffYear} year${diffYear !== 1 ? 's' : ''} ago`;
     }
 }
 

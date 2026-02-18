@@ -393,6 +393,33 @@ button:active {
     font-weight: 600;
 }
 
+.jwt-content {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+.jwt-field {
+    color: var(--primary-color);
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 1px dotted var(--primary-color);
+    text-decoration: none;
+}
+
+.jwt-field:hover {
+    background: rgba(10, 110, 209, 0.1);
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.jwt-section pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 .jwt-section pre {
     background: white;
     padding: 15px;
@@ -402,6 +429,32 @@ button:active {
     font-size: 13px;
     white-space: pre-wrap;
     word-wrap: break-word;
+}
+
+/* Timestamp Converter Specific Styles */
+.timestamp-section {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.timestamp-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.timestamp-section h4 {
+    color: var(--primary-color);
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.timestamp-section strong {
+    color: var(--secondary-color);
+    display: inline-block;
+    min-width: 180px;
 }
 
 /* Hash Generator Specific Styles */

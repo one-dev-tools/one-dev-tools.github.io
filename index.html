@@ -154,15 +154,15 @@
                             <div id="jwt-output" class="jwt-output">
                                 <div class="jwt-section">
                                     <h4>Header</h4>
-                                    <pre id="jwt-header"></pre>
+                                    <div id="jwt-header" class="jwt-content"></div>
                                 </div>
                                 <div class="jwt-section">
                                     <h4>Payload</h4>
-                                    <pre id="jwt-payload"></pre>
+                                    <div id="jwt-payload" class="jwt-content"></div>
                                 </div>
                                 <div class="jwt-section">
                                     <h4>Signature</h4>
-                                    <pre id="jwt-signature"></pre>
+                                    <div id="jwt-signature" class="jwt-content"></div>
                                 </div>
                             </div>
                         </div>
@@ -262,6 +262,11 @@
                                 <label>ISO 8601:</label>
                                 <input type="text" id="current-iso" readonly>
                                 <button onclick="copyToClipboardFromInput('current-iso')">Copy</button>
+                            </div>
+                            <div class="time-display">
+                                <label>Browser Locale:</label>
+                                <input type="text" id="current-locale" readonly>
+                                <button onclick="copyToClipboardFromInput('current-locale')">Copy</button>
                             </div>
                         </div>
                     </div>
