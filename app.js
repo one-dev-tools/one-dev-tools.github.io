@@ -634,7 +634,17 @@ function formatJWTWithTooltips(obj, section) {
         const isLast = index === entries.length - 1;
         const indent = '  ';
         
-        let valueStr = JSON.stringify(value);
+        // Check if value is an object or array (needs formatting)
+        let valueStr;
+        if (typeof value === 'object' && value !== null) {
+            // Format nested objects/arrays with proper indentation
+            valueStr = JSON.stringify(value, null, 2).split('\n').map((line, i) => 
+                i === 0 ? line : '  ' + line
+            ).join('\n');
+        } else {
+            valueStr = JSON.stringify(value);
+        }
+        
         let tooltip = '';
         
         // Add tooltip for known fields
@@ -659,9 +669,10 @@ function formatJWTWithTooltips(obj, section) {
         
         if (tooltip) {
             const escapedTooltip = tooltip.replace(/"/g, '&quot;');
-            formatted += `${indent}<span class="jwt-field" title="${escapedTooltip}">"${key}"</span>: ${valueStr}${isLast ? '' : ','}\n`;
+            formatted += `${indent}<span class="jwt-field jwt-known-field" title="${escapedTooltip}">"${key}"</span>: ${valueStr}${isLast ? '' : ','}\n`;
         } else {
-            formatted += `${indent}"${key}": ${valueStr}${isLast ? '' : ','}\n`;
+            // Non-standard claims: make bold but no tooltip
+            formatted += `${indent}<span class="jwt-field">"${key}"</span>: ${valueStr}${isLast ? '' : ','}\n`;
         }
     });
     
