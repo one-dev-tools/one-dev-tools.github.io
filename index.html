@@ -36,116 +36,160 @@
             <!-- URL Encoder/Decoder -->
             <div class="tool-panel active" id="url-encoder">
                 <h2>URL Encoder/Decoder</h2>
-                <div class="tool-content">
-                    <textarea id="url-input" placeholder="Enter URL or text to encode/decode..."></textarea>
-                    <div class="button-group">
-                        <button onclick="encodeURL()">Encode</button>
-                        <button onclick="decodeURL()">Decode</button>
-                        <button onclick="clearInput('url-input', 'url-output')">Clear</button>
-                    </div>
-                    <textarea id="url-output" readonly placeholder="Result will appear here..."></textarea>
+                <div class="button-group">
+                    <button onclick="encodeURL()">Encode</button>
+                    <button onclick="decodeURL()">Decode</button>
+                    <button onclick="clearInput('url-input', 'url-output')">Clear</button>
                     <button class="copy-btn" onclick="copyToClipboard('url-output')">Copy Result</button>
+                </div>
+                <div class="tool-content">
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>Input</h3>
+                            <textarea id="url-input" placeholder="Enter URL or text to encode/decode..."></textarea>
+                        </div>
+                        <div class="tool-output-panel">
+                            <h3>Output</h3>
+                            <textarea id="url-output" readonly placeholder="Result will appear here..."></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- JSON Formatter -->
             <div class="tool-panel" id="json-formatter">
                 <h2>JSON Formatter</h2>
-                <div class="tool-content">
-                    <textarea id="json-input" placeholder='Enter JSON here... e.g., {"name":"John","age":30}'></textarea>
-                    <div class="button-group">
-                        <button onclick="formatJSON()">Format (Pretty)</button>
-                        <button onclick="minifyJSON()">Minify</button>
-                        <button onclick="validateJSON()">Validate</button>
-                        <button onclick="clearInput('json-input', 'json-output')">Clear</button>
-                    </div>
+                <div class="button-group">
+                    <button onclick="formatJSON()">Format (Pretty)</button>
+                    <button onclick="minifyJSON()">Minify</button>
+                    <button onclick="validateJSON()">Validate</button>
+                    <button onclick="clearInput('json-input', 'json-output')">Clear</button>
+                    <button class="copy-btn" onclick="copyToClipboard('json-output')">Copy Result</button>
                     <div class="indent-control">
                         <label>Indent Size:</label>
                         <input type="number" id="json-indent" value="2" min="1" max="8">
                     </div>
-                    <textarea id="json-output" readonly placeholder="Formatted JSON will appear here..."></textarea>
-                    <button class="copy-btn" onclick="copyToClipboard('json-output')">Copy Result</button>
-                    <div id="json-validation" class="validation-message"></div>
+                </div>
+                <div id="json-validation" class="validation-message"></div>
+                <div class="tool-content">
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>Input</h3>
+                            <textarea id="json-input" placeholder='Enter JSON here... e.g., {"name":"John","age":30}'></textarea>
+                        </div>
+                        <div class="tool-output-panel">
+                            <h3>Output</h3>
+                            <textarea id="json-output" readonly placeholder="Formatted JSON will appear here..."></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- JSON Visualizer -->
             <div class="tool-panel" id="json-visualizer">
                 <h2>JSON Visualizer</h2>
+                <div class="button-group">
+                    <button onclick="visualizeJSON()">Visualize</button>
+                    <button onclick="expandAllJSON()">Expand All</button>
+                    <button onclick="collapseAllJSON()">Collapse All</button>
+                    <button onclick="copyVisualizedJSON()">Copy as JSON</button>
+                    <button onclick="clearInput('json-viz-input', 'json-viz-output')">Clear</button>
+                </div>
+                <div id="json-viz-validation" class="validation-message"></div>
                 <div class="tool-content">
-                    <textarea id="json-viz-input" placeholder='Enter JSON to visualize... e.g., {"users":[{"name":"John","age":30},{"name":"Jane","age":25}]}'></textarea>
-                    <div class="button-group">
-                        <button onclick="visualizeJSON()">Visualize</button>
-                        <button onclick="expandAllJSON()">Expand All</button>
-                        <button onclick="collapseAllJSON()">Collapse All</button>
-                        <button onclick="copyVisualizedJSON()">Copy as JSON</button>
-                        <button onclick="clearInput('json-viz-input', 'json-viz-output')">Clear</button>
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>Input</h3>
+                            <textarea id="json-viz-input" placeholder='Enter JSON to visualize... e.g., {"users":[{"name":"John","age":30}]}'></textarea>
+                        </div>
+                        <div class="tool-output-panel">
+                            <h3>Interactive Tree View</h3>
+                            <div id="json-viz-output" class="json-tree"></div>
+                        </div>
                     </div>
-                    <div id="json-viz-validation" class="validation-message"></div>
-                    <div id="json-viz-output" class="json-tree"></div>
                 </div>
             </div>
 
             <!-- XML Formatter -->
             <div class="tool-panel" id="xml-formatter">
                 <h2>XML Formatter</h2>
-                <div class="tool-content">
-                    <textarea id="xml-input" placeholder="Enter XML here... e.g., <root><item>value</item></root>"></textarea>
-                    <div class="button-group">
-                        <button onclick="formatXML()">Format (Pretty)</button>
-                        <button onclick="minifyXML()">Minify</button>
-                        <button onclick="validateXML()">Validate</button>
-                        <button onclick="clearInput('xml-input', 'xml-output')">Clear</button>
-                    </div>
+                <div class="button-group">
+                    <button onclick="formatXML()">Format (Pretty)</button>
+                    <button onclick="minifyXML()">Minify</button>
+                    <button onclick="validateXML()">Validate</button>
+                    <button onclick="clearInput('xml-input', 'xml-output')">Clear</button>
+                    <button class="copy-btn" onclick="copyToClipboard('xml-output')">Copy Result</button>
                     <div class="indent-control">
                         <label>Indent Size:</label>
                         <input type="number" id="xml-indent" value="2" min="1" max="8">
                     </div>
-                    <textarea id="xml-output" readonly placeholder="Formatted XML will appear here..."></textarea>
-                    <button class="copy-btn" onclick="copyToClipboard('xml-output')">Copy Result</button>
-                    <div id="xml-validation" class="validation-message"></div>
+                </div>
+                <div id="xml-validation" class="validation-message"></div>
+                <div class="tool-content">
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>Input</h3>
+                            <textarea id="xml-input" placeholder="Enter XML here... e.g., <root><item>value</item></root>"></textarea>
+                        </div>
+                        <div class="tool-output-panel">
+                            <h3>Output</h3>
+                            <textarea id="xml-output" readonly placeholder="Formatted XML will appear here..."></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- JWT Decoder -->
             <div class="tool-panel" id="jwt-decoder">
                 <h2>JWT Decoder</h2>
+                <div id="jwt-validation" class="validation-message"></div>
                 <div class="tool-content">
-                    <textarea id="jwt-input" placeholder="Paste your JWT token here..."></textarea>
-                    <div class="button-group">
-                        <button onclick="decodeJWT()">Decode</button>
-                        <button onclick="clearInput('jwt-input', 'jwt-output')">Clear</button>
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>JWT Token</h3>
+                            <textarea id="jwt-input" placeholder="Paste your JWT token here..." oninput="decodeJWT()"></textarea>
+                        </div>
+                        <div class="tool-output-panel">
+                            <h3>Decoded JWT</h3>
+                            <div id="jwt-output" class="jwt-output">
+                                <div class="jwt-section">
+                                    <h4>Header</h4>
+                                    <pre id="jwt-header"></pre>
+                                </div>
+                                <div class="jwt-section">
+                                    <h4>Payload</h4>
+                                    <pre id="jwt-payload"></pre>
+                                </div>
+                                <div class="jwt-section">
+                                    <h4>Signature</h4>
+                                    <pre id="jwt-signature"></pre>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div id="jwt-output" class="jwt-output">
-                        <div class="jwt-section">
-                            <h3>Header</h3>
-                            <pre id="jwt-header"></pre>
-                        </div>
-                        <div class="jwt-section">
-                            <h3>Payload</h3>
-                            <pre id="jwt-payload"></pre>
-                        </div>
-                        <div class="jwt-section">
-                            <h3>Signature</h3>
-                            <pre id="jwt-signature"></pre>
-                        </div>
-                    </div>
-                    <div id="jwt-validation" class="validation-message"></div>
                 </div>
             </div>
 
             <!-- Base64 Encoder/Decoder -->
             <div class="tool-panel" id="base64">
                 <h2>Base64 Encoder/Decoder</h2>
-                <div class="tool-content">
-                    <textarea id="base64-input" placeholder="Enter text or Base64 string..."></textarea>
-                    <div class="button-group">
-                        <button onclick="encodeBase64()">Encode</button>
-                        <button onclick="decodeBase64()">Decode</button>
-                        <button onclick="clearInput('base64-input', 'base64-output')">Clear</button>
-                    </div>
-                    <textarea id="base64-output" readonly placeholder="Result will appear here..."></textarea>
+                <div class="button-group">
+                    <button onclick="encodeBase64()">Encode</button>
+                    <button onclick="decodeBase64()">Decode</button>
+                    <button onclick="clearInput('base64-input', 'base64-output')">Clear</button>
                     <button class="copy-btn" onclick="copyToClipboard('base64-output')">Copy Result</button>
+                </div>
+                <div class="tool-content">
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>Input</h3>
+                            <textarea id="base64-input" placeholder="Enter text or Base64 string..."></textarea>
+                        </div>
+                        <div class="tool-output-panel">
+                            <h3>Output</h3>
+                            <textarea id="base64-output" readonly placeholder="Result will appear here..."></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
 

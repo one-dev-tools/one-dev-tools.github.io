@@ -538,6 +538,15 @@ function decodeJWT() {
     const input = document.getElementById('jwt-input').value.trim();
     const validation = document.getElementById('jwt-validation');
     
+    if (!input) {
+        validation.textContent = '';
+        validation.className = 'validation-message';
+        document.getElementById('jwt-header').textContent = '';
+        document.getElementById('jwt-payload').textContent = '';
+        document.getElementById('jwt-signature').textContent = '';
+        return;
+    }
+    
     try {
         const parts = input.split('.');
         if (parts.length !== 3) {
