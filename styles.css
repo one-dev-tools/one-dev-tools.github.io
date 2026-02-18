@@ -206,6 +206,112 @@ button:active {
     border: 1px solid #f5c6cb;
 }
 
+/* JSON Visualizer Specific Styles */
+.json-tree {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    border: 2px solid var(--border-color);
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    max-height: 600px;
+    overflow-y: auto;
+    margin-top: 15px;
+}
+
+.json-tree-node {
+    margin-left: 20px;
+    position: relative;
+}
+
+.json-tree-node.root {
+    margin-left: 0;
+}
+
+.json-tree-key {
+    color: #881391;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+
+.json-tree-key:hover {
+    text-decoration: underline;
+}
+
+.json-tree-toggle {
+    display: inline-block;
+    width: 16px;
+    cursor: pointer;
+    user-select: none;
+    font-weight: bold;
+    color: #666;
+    margin-right: 5px;
+}
+
+.json-tree-toggle:hover {
+    color: var(--primary-color);
+}
+
+.json-tree-value {
+    display: inline;
+}
+
+.json-tree-value.string {
+    color: #c41a16;
+}
+
+.json-tree-value.number {
+    color: #1c00cf;
+}
+
+.json-tree-value.boolean {
+    color: #0d22aa;
+    font-weight: 600;
+}
+
+.json-tree-value.null {
+    color: #808080;
+    font-style: italic;
+}
+
+.json-tree-bracket {
+    color: #555;
+    font-weight: bold;
+}
+
+.json-tree-comma {
+    color: #555;
+}
+
+.json-tree-children {
+    display: block;
+    margin-left: 20px;
+    border-left: 1px dashed #ddd;
+    padding-left: 10px;
+}
+
+.json-tree-children.collapsed {
+    display: none;
+}
+
+.json-tree-item {
+    margin: 5px 0;
+    line-height: 1.6;
+}
+
+.json-tree-count {
+    color: #999;
+    font-size: 0.9em;
+    font-style: italic;
+    margin-left: 5px;
+}
+
+.json-tree-empty {
+    color: #999;
+    font-style: italic;
+}
+
 /* JWT Decoder Specific Styles */
 .jwt-output {
     display: flex;

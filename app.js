@@ -150,6 +150,167 @@ function validateJSON() {
     }
 }
 
+// JSON Visualizer
+function visualizeJSON() {
+    const input = document.getElementById('json-viz-input').value;
+    const output = document.getElementById('json-viz-output');
+    const validation = document.getElementById('json-viz-validation');
+    
+    try {
+        const parsed = JSON.parse(input);
+        output.innerHTML = '';
+        
+        const rootNode = createJSONTreeNode('root', parsed, true);
+        output.appendChild(rootNode);
+        
+        validation.textContent = '✓ Valid JSON - Click keys to expand/collapse';
+        validation.className = 'validation-message success';
+    } catch (error) {
+        validation.textContent = '✗ Invalid JSON: ' + error.message;
+        validation.className = 'validation-message error';
+        output.innerHTML = '';
+    }
+}
+
+function createJSONTreeNode(key, value, isRoot = false) {
+    const nodeDiv = document.createElement('div');
+    nodeDiv.className = isRoot ? 'json-tree-node root' : 'json-tree-node';
+    
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'json-tree-item';
+    
+    const type = getJSONType(value);
+    
+    if (type === 'object' || type === 'array') {
+        const toggle = document.createElement('span');
+        toggle.className = 'json-tree-toggle';
+        toggle.textContent = '▼';
+        toggle.onclick = function(e) {
+            e.stopPropagation();
+            toggleJSONNode(this);
+        };
+        itemDiv.appendChild(toggle);
+        
+        if (!isRoot) {
+            const keySpan = document.createElement('span');
+            keySpan.className = 'json-tree-key';
+            keySpan.textContent = key;
+            keySpan.onclick = function(e) {
+                e.stopPropagation();
+                toggleJSONNode(toggle);
+            };
+            itemDiv.appendChild(keySpan);
+            itemDiv.appendChild(document.createTextNode(': '));
+        }
+        
+        const bracket = document.createElement('span');
+        bracket.className = 'json-tree-bracket';
+        bracket.textContent = type === 'array' ? '[' : '{';
+        itemDiv.appendChild(bracket);
+        
+        const keys = type === 'array' ? value : Object.keys(value);
+        const count = document.createElement('span');
+        count.className = 'json-tree-count';
+        count.textContent = type === 'array' ? `${keys.length} items` : `${keys.length} keys`;
+        itemDiv.appendChild(count);
+        
+        nodeDiv.appendChild(itemDiv);
+        
+        const childrenDiv = document.createElement('div');
+        childrenDiv.className = 'json-tree-children';
+        
+        if (type === 'array') {
+            value.forEach((item, index) => {
+                childrenDiv.appendChild(createJSONTreeNode(`[${index}]`, item));
+            });
+        } else {
+            Object.keys(value).forEach(k => {
+                childrenDiv.appendChild(createJSONTreeNode(k, value[k]));
+            });
+        }
+        
+        if (keys.length === 0) {
+            const emptySpan = document.createElement('span');
+            emptySpan.className = 'json-tree-empty';
+            emptySpan.textContent = type === 'array' ? ' empty' : ' empty';
+            itemDiv.appendChild(emptySpan);
+        }
+        
+        nodeDiv.appendChild(childrenDiv);
+        
+        const closingDiv = document.createElement('div');
+        closingDiv.className = 'json-tree-item';
+        const closeBracket = document.createElement('span');
+        closeBracket.className = 'json-tree-bracket';
+        closeBracket.textContent = type === 'array' ? ']' : '}';
+        closingDiv.appendChild(closeBracket);
+        nodeDiv.appendChild(closingDiv);
+        
+    } else {
+        if (!isRoot) {
+            const keySpan = document.createElement('span');
+            keySpan.className = 'json-tree-key';
+            keySpan.textContent = key;
+            itemDiv.appendChild(keySpan);
+            itemDiv.appendChild(document.createTextNode(': '));
+        }
+        
+        const valueSpan = document.createElement('span');
+        valueSpan.className = `json-tree-value ${type}`;
+        
+        if (type === 'string') {
+            valueSpan.textContent = `"${value}"`;
+        } else if (type === 'null') {
+            valueSpan.textContent = 'null';
+        } else {
+            valueSpan.textContent = String(value);
+        }
+        
+        itemDiv.appendChild(valueSpan);
+        nodeDiv.appendChild(itemDiv);
+    }
+    
+    return nodeDiv;
+}
+
+function getJSONType(value) {
+    if (value === null) return 'null';
+    if (Array.isArray(value)) return 'array';
+    if (typeof value === 'object') return 'object';
+    if (typeof value === 'string') return 'string';
+    if (typeof value === 'number') return 'number';
+    if (typeof value === 'boolean') return 'boolean';
+    return 'unknown';
+}
+
+function toggleJSONNode(toggle) {
+    const node = toggle.parentElement.parentElement;
+    const children = node.querySelector('.json-tree-children');
+    
+    if (children) {
+        children.classList.toggle('collapsed');
+        toggle.textContent = children.classList.contains('collapsed') ? '▶' : '▼';
+    }
+}
+
+function expandAllJSON() {
+    const output = document.getElementById('json-viz-output');
+    const allChildren = output.querySelectorAll('.json-tree-children');
+    const allToggles = output.querySelectorAll('.json-tree-toggle');
+    
+    allChildren.forEach(child => child.classList.remove('collapsed'));
+    allToggles.forEach(toggle => toggle.textContent = '▼');
+}
+
+function collapseAllJSON() {
+    const output = document.getElementById('json-viz-output');
+    const allChildren = output.querySelectorAll('.json-tree-children');
+    const allToggles = output.querySelectorAll('.json-tree-toggle');
+    
+    allChildren.forEach(child => child.classList.add('collapsed'));
+    allToggles.forEach(toggle => toggle.textContent = '▶');
+}
+
 // XML Formatter
 function formatXML() {
     const input = document.getElementById('xml-input').value;
