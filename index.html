@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dev Tools - Developer Utilities</title>
+    <meta name="description" content="Developer tools including URL encoder/decoder, JSON formatter, XML formatter, JWT decoder, Base64 encoder, hash generator, UUID generator, timestamp converter, and color converter.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛠️ Dev Tools</h1>
+            <p class="subtitle">Essential developer utilities in your browser</p>
+        </header>
+
+        <nav class="tool-nav">
+            <button class="tool-btn active" data-tool="url-encoder">URL Encoder/Decoder</button>
+            <button class="tool-btn" data-tool="json-formatter">JSON Formatter</button>
+            <button class="tool-btn" data-tool="xml-formatter">XML Formatter</button>
+            <button class="tool-btn" data-tool="jwt-decoder">JWT Decoder</button>
+            <button class="tool-btn" data-tool="base64">Base64 Encoder/Decoder</button>
+            <button class="tool-btn" data-tool="hash-generator">Hash Generator</button>
+            <button class="tool-btn" data-tool="uuid-generator">UUID Generator</button>
+            <button class="tool-btn" data-tool="timestamp-converter">Timestamp Converter</button>
+            <button class="tool-btn" data-tool="color-converter">Color Converter</button>
+        </nav>
+
+        <main class="tool-container">
+            <!-- URL Encoder/Decoder -->
+            <div class="tool-panel active" id="url-encoder">
+                <h2>URL Encoder/Decoder</h2>
+                <div class="tool-content">
+                    <textarea id="url-input" placeholder="Enter URL or text to encode/decode..."></textarea>
+                    <div class="button-group">
+                        <button onclick="encodeURL()">Encode</button>
+                        <button onclick="decodeURL()">Decode</button>
+                        <button onclick="clearInput('url-input', 'url-output')">Clear</button>
+                    </div>
+                    <textarea id="url-output" readonly placeholder="Result will appear here..."></textarea>
+                    <button class="copy-btn" onclick="copyToClipboard('url-output')">Copy Result</button>
+                </div>
+            </div>
+
+            <!-- JSON Formatter -->
+            <div class="tool-panel" id="json-formatter">
+                <h2>JSON Formatter</h2>
+                <div class="tool-content">
+                    <textarea id="json-input" placeholder='Enter JSON here... e.g., {"name":"John","age":30}'></textarea>
+                    <div class="button-group">
+                        <button onclick="formatJSON()">Format (Pretty)</button>
+                        <button onclick="minifyJSON()">Minify</button>
+                        <button onclick="validateJSON()">Validate</button>
+                        <button onclick="clearInput('json-input', 'json-output')">Clear</button>
+                    </div>
+                    <div class="indent-control">
+                        <label>Indent Size:</label>
+                        <input type="number" id="json-indent" value="2" min="1" max="8">
+                    </div>
+                    <textarea id="json-output" readonly placeholder="Formatted JSON will appear here..."></textarea>
+                    <button class="copy-btn" onclick="copyToClipboard('json-output')">Copy Result</button>
+                    <div id="json-validation" class="validation-message"></div>
+                </div>
+            </div>
+
+            <!-- XML Formatter -->
+            <div class="tool-panel" id="xml-formatter">
+                <h2>XML Formatter</h2>
+                <div class="tool-content">
+                    <textarea id="xml-input" placeholder="Enter XML here... e.g., <root><item>value</item></root>"></textarea>
+                    <div class="button-group">
+                        <button onclick="formatXML()">Format (Pretty)</button>
+                        <button onclick="minifyXML()">Minify</button>
+                        <button onclick="validateXML()">Validate</button>
+                        <button onclick="clearInput('xml-input', 'xml-output')">Clear</button>
+                    </div>
+                    <div class="indent-control">
+                        <label>Indent Size:</label>
+                        <input type="number" id="xml-indent" value="2" min="1" max="8">
+                    </div>
+                    <textarea id="xml-output" readonly placeholder="Formatted XML will appear here..."></textarea>
+                    <button class="copy-btn" onclick="copyToClipboard('xml-output')">Copy Result</button>
+                    <div id="xml-validation" class="validation-message"></div>
+                </div>
+            </div>
+
+            <!-- JWT Decoder -->
+            <div class="tool-panel" id="jwt-decoder">
+                <h2>JWT Decoder</h2>
+                <div class="tool-content">
+                    <textarea id="jwt-input" placeholder="Paste your JWT token here..."></textarea>
+                    <div class="button-group">
+                        <button onclick="decodeJWT()">Decode</button>
+                        <button onclick="clearInput('jwt-input', 'jwt-output')">Clear</button>
+                    </div>
+                    <div id="jwt-output" class="jwt-output">
+                        <div class="jwt-section">
+                            <h3>Header</h3>
+                            <pre id="jwt-header"></pre>
+                        </div>
+                        <div class="jwt-section">
+                            <h3>Payload</h3>
+                            <pre id="jwt-payload"></pre>
+                        </div>
+                        <div class="jwt-section">
+                            <h3>Signature</h3>
+                            <pre id="jwt-signature"></pre>
+                        </div>
+                    </div>
+                    <div id="jwt-validation" class="validation-message"></div>
+                </div>
+            </div>
+
+            <!-- Base64 Encoder/Decoder -->
+            <div class="tool-panel" id="base64">
+                <h2>Base64 Encoder/Decoder</h2>
+                <div class="tool-content">
+                    <textarea id="base64-input" placeholder="Enter text or Base64 string..."></textarea>
+                    <div class="button-group">
+                        <button onclick="encodeBase64()">Encode</button>
+                        <button onclick="decodeBase64()">Decode</button>
+                        <button onclick="clearInput('base64-input', 'base64-output')">Clear</button>
+                    </div>
+                    <textarea id="base64-output" readonly placeholder="Result will appear here..."></textarea>
+                    <button class="copy-btn" onclick="copyToClipboard('base64-output')">Copy Result</button>
+                </div>
+            </div>
+
+            <!-- Hash Generator -->
+            <div class="tool-panel" id="hash-generator">
+                <h2>Hash Generator</h2>
+                <div class="tool-content">
+                    <textarea id="hash-input" placeholder="Enter text to hash..."></textarea>
+                    <div class="button-group">
+                        <button onclick="generateHashes()">Generate Hashes</button>
+                        <button onclick="clearInput('hash-input', 'hash-output')">Clear</button>
+                    </div>
+                    <div id="hash-output" class="hash-output">
+                        <div class="hash-result">
+                            <label>MD5:</label>
+                            <input type="text" id="hash-md5" readonly>
+                            <button onclick="copyToClipboardFromInput('hash-md5')">Copy</button>
+                        </div>
+                        <div class="hash-result">
+                            <label>SHA-1:</label>
+                            <input type="text" id="hash-sha1" readonly>
+                            <button onclick="copyToClipboardFromInput('hash-sha1')">Copy</button>
+                        </div>
+                        <div class="hash-result">
+                            <label>SHA-256:</label>
+                            <input type="text" id="hash-sha256" readonly>
+                            <button onclick="copyToClipboardFromInput('hash-sha256')">Copy</button>
+                        </div>
+                        <div class="hash-result">
+                            <label>SHA-512:</label>
+                            <input type="text" id="hash-sha512" readonly>
+                            <button onclick="copyToClipboardFromInput('hash-sha512')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UUID Generator -->
+            <div class="tool-panel" id="uuid-generator">
+                <h2>UUID Generator</h2>
+                <div class="tool-content">
+                    <div class="button-group">
+                        <button onclick="generateUUID()">Generate UUID v4</button>
+                        <button onclick="generateMultipleUUIDs()">Generate 10 UUIDs</button>
+                        <button onclick="clearInput('uuid-output')">Clear</button>
+                    </div>
+                    <textarea id="uuid-output" readonly placeholder="Generated UUIDs will appear here..."></textarea>
+                    <button class="copy-btn" onclick="copyToClipboard('uuid-output')">Copy Result</button>
+                </div>
+            </div>
+
+            <!-- Timestamp Converter -->
+            <div class="tool-panel" id="timestamp-converter">
+                <h2>Timestamp Converter</h2>
+                <div class="tool-content">
+                    <div class="timestamp-section">
+                        <h3>Current Timestamp</h3>
+                        <div class="current-time">
+                            <div class="time-display">
+                                <label>Unix (seconds):</label>
+                                <input type="text" id="current-unix" readonly>
+                                <button onclick="copyToClipboardFromInput('current-unix')">Copy</button>
+                            </div>
+                            <div class="time-display">
+                                <label>Unix (milliseconds):</label>
+                                <input type="text" id="current-unix-ms" readonly>
+                                <button onclick="copyToClipboardFromInput('current-unix-ms')">Copy</button>
+                            </div>
+                            <div class="time-display">
+                                <label>ISO 8601:</label>
+                                <input type="text" id="current-iso" readonly>
+                                <button onclick="copyToClipboardFromInput('current-iso')">Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timestamp-section">
+                        <h3>Convert Timestamp</h3>
+                        <input type="text" id="timestamp-input" placeholder="Enter Unix timestamp (seconds or milliseconds)">
+                        <button onclick="convertTimestamp()">Convert</button>
+                        <div id="timestamp-output" class="timestamp-result"></div>
+                    </div>
+                    <div class="timestamp-section">
+                        <h3>Convert Date to Timestamp</h3>
+                        <input type="datetime-local" id="date-input">
+                        <button onclick="convertDateToTimestamp()">Convert to Timestamp</button>
+                        <div id="date-output" class="timestamp-result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Color Converter -->
+            <div class="tool-panel" id="color-converter">
+                <h2>Color Converter</h2>
+                <div class="tool-content">
+                    <div class="color-picker-section">
+                        <label>Pick a Color:</label>
+                        <input type="color" id="color-picker" value="#3498db" onchange="convertColor()">
+                        <div id="color-preview" style="background-color: #3498db;"></div>
+                    </div>
+                    <div class="color-input-section">
+                        <label>Or enter a color (HEX, RGB, HSL):</label>
+                        <input type="text" id="color-input" placeholder="e.g., #3498db, rgb(52,152,219), hsl(204,70%,53%)">
+                        <button onclick="parseColorInput()">Convert</button>
+                    </div>
+                    <div id="color-output" class="color-output">
+                        <div class="color-result">
+                            <label>HEX:</label>
+                            <input type="text" id="color-hex" readonly>
+                            <button onclick="copyToClipboardFromInput('color-hex')">Copy</button>
+                        </div>
+                        <div class="color-result">
+                            <label>RGB:</label>
+                            <input type="text" id="color-rgb" readonly>
+                            <button onclick="copyToClipboardFromInput('color-rgb')">Copy</button>
+                        </div>
+                        <div class="color-result">
+                            <label>HSL:</label>
+                            <input type="text" id="color-hsl" readonly>
+                            <button onclick="copyToClipboardFromInput('color-hsl')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Dev Tools - All processing happens locally in your browser. Your data never leaves your device.</p>
+            <p>© 2026 | <a href="https://github.tools.sap/I076157/dev-tools" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</body>
+</html>
