@@ -275,6 +275,27 @@ button:active {
     font-style: italic;
 }
 
+.json-tree-value.editable {
+    padding: 2px 6px;
+    border-radius: 3px;
+    cursor: text;
+    transition: background 0.2s;
+}
+
+.json-tree-value.editable:hover {
+    background: #f0f0f0;
+    outline: 1px dashed #ccc;
+}
+
+.json-tree-value.editing {
+    background: white;
+    border: 1px solid var(--primary-color);
+    padding: 2px 6px;
+    outline: 2px solid rgba(52, 152, 219, 0.2);
+    min-width: 50px;
+    display: inline-block;
+}
+
 .json-tree-bracket {
     color: #555;
     font-weight: bold;

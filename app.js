@@ -151,28 +151,31 @@ function validateJSON() {
 }
 
 // JSON Visualizer
+let currentJSONData = null;
+
 function visualizeJSON() {
     const input = document.getElementById('json-viz-input').value;
     const output = document.getElementById('json-viz-output');
     const validation = document.getElementById('json-viz-validation');
     
     try {
-        const parsed = JSON.parse(input);
+        currentJSONData = JSON.parse(input);
         output.innerHTML = '';
         
-        const rootNode = createJSONTreeNode('root', parsed, true);
+        const rootNode = createJSONTreeNode('root', currentJSONData, true, []);
         output.appendChild(rootNode);
         
-        validation.textContent = '✓ Valid JSON - Click keys to expand/collapse';
+        validation.textContent = '✓ Valid JSON - Click keys to expand/collapse, click values to edit';
         validation.className = 'validation-message success';
     } catch (error) {
         validation.textContent = '✗ Invalid JSON: ' + error.message;
         validation.className = 'validation-message error';
         output.innerHTML = '';
+        currentJSONData = null;
     }
 }
 
-function createJSONTreeNode(key, value, isRoot = false) {
+function createJSONTreeNode(key, value, isRoot = false, path = []) {
     const nodeDiv = document.createElement('div');
     nodeDiv.className = isRoot ? 'json-tree-node root' : 'json-tree-node';
     
@@ -221,11 +224,11 @@ function createJSONTreeNode(key, value, isRoot = false) {
         
         if (type === 'array') {
             value.forEach((item, index) => {
-                childrenDiv.appendChild(createJSONTreeNode(`[${index}]`, item));
+                childrenDiv.appendChild(createJSONTreeNode(`[${index}]`, item, false, [...path, index]));
             });
         } else {
             Object.keys(value).forEach(k => {
-                childrenDiv.appendChild(createJSONTreeNode(k, value[k]));
+                childrenDiv.appendChild(createJSONTreeNode(k, value[k], false, [...path, k]));
             });
         }
         
@@ -256,7 +259,10 @@ function createJSONTreeNode(key, value, isRoot = false) {
         }
         
         const valueSpan = document.createElement('span');
-        valueSpan.className = `json-tree-value ${type}`;
+        valueSpan.className = `json-tree-value ${type} editable`;
+        valueSpan.contentEditable = false;
+        valueSpan.dataset.path = JSON.stringify(path);
+        valueSpan.dataset.type = type;
         
         if (type === 'string') {
             valueSpan.textContent = `"${value}"`;
@@ -266,11 +272,123 @@ function createJSONTreeNode(key, value, isRoot = false) {
             valueSpan.textContent = String(value);
         }
         
+        // Make value editable
+        valueSpan.onclick = function(e) {
+            e.stopPropagation();
+            makeValueEditable(this);
+        };
+        
         itemDiv.appendChild(valueSpan);
         nodeDiv.appendChild(itemDiv);
     }
     
     return nodeDiv;
+}
+
+function makeValueEditable(valueSpan) {
+    if (valueSpan.contentEditable === 'true') return;
+    
+    const originalValue = valueSpan.textContent;
+    valueSpan.classList.add('editing');
+    valueSpan.contentEditable = true;
+    valueSpan.focus();
+    
+    // Select all text
+    const range = document.createRange();
+    range.selectNodeContents(valueSpan);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    
+    const saveEdit = () => {
+        valueSpan.classList.remove('editing');
+        valueSpan.contentEditable = false;
+        
+        const newValue = valueSpan.textContent.trim();
+        const type = valueSpan.dataset.type;
+        const path = JSON.parse(valueSpan.dataset.path);
+        
+        try {
+            let parsedValue;
+            
+            if (type === 'string') {
+                // Remove quotes if present
+                parsedValue = newValue.replace(/^"|"$/g, '');
+                valueSpan.textContent = `"${parsedValue}"`;
+            } else if (type === 'number') {
+                parsedValue = Number(newValue);
+                if (isNaN(parsedValue)) {
+                    throw new Error('Invalid number');
+                }
+                valueSpan.textContent = String(parsedValue);
+            } else if (type === 'boolean') {
+                if (newValue !== 'true' && newValue !== 'false') {
+                    throw new Error('Boolean must be true or false');
+                }
+                parsedValue = newValue === 'true';
+                valueSpan.textContent = String(parsedValue);
+            } else if (type === 'null') {
+                if (newValue !== 'null') {
+                    throw new Error('Must be null');
+                }
+                parsedValue = null;
+                valueSpan.textContent = 'null';
+            }
+            
+            // Update the data structure
+            updateJSONValue(path, parsedValue);
+            
+        } catch (error) {
+            valueSpan.textContent = originalValue;
+            showNotification('Invalid value: ' + error.message, 'error');
+        }
+    };
+    
+    valueSpan.onblur = saveEdit;
+    valueSpan.onkeydown = function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            saveEdit();
+        } else if (e.key === 'Escape') {
+            valueSpan.textContent = originalValue;
+            valueSpan.classList.remove('editing');
+            valueSpan.contentEditable = false;
+            valueSpan.blur();
+        }
+    };
+}
+
+function updateJSONValue(path, newValue) {
+    if (!currentJSONData) return;
+    
+    let obj = currentJSONData;
+    for (let i = 0; i < path.length - 1; i++) {
+        obj = obj[path[i]];
+    }
+    
+    if (path.length > 0) {
+        obj[path[path.length - 1]] = newValue;
+    } else {
+        currentJSONData = newValue;
+    }
+}
+
+function copyVisualizedJSON() {
+    if (!currentJSONData) {
+        showNotification('No JSON to copy. Please visualize JSON first.', 'error');
+        return;
+    }
+    
+    try {
+        const jsonString = JSON.stringify(currentJSONData, null, 2);
+        navigator.clipboard.writeText(jsonString).then(() => {
+            showNotification('JSON copied to clipboard!', 'success');
+        }).catch(err => {
+            showNotification('Failed to copy JSON', 'error');
+        });
+    } catch (error) {
+        showNotification('Error copying JSON: ' + error.message, 'error');
+    }
 }
 
 function getJSONType(value) {
