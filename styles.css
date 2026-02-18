@@ -452,6 +452,35 @@ button:active {
     word-wrap: break-word;
 }
 
+/* UUID Generator Specific Styles */
+.uuid-outputs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-top: 15px;
+}
+
+.uuid-format-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.uuid-format-section h3 {
+    color: var(--secondary-color);
+    font-size: 1em;
+    font-weight: 600;
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.uuid-format-section textarea {
+    min-height: 200px;
+    height: 200px;
+    max-height: 200px;
+}
+
 /* Timestamp Converter Specific Styles */
 .timestamp-section {
     margin-bottom: 20px;

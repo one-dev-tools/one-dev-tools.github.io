@@ -711,15 +711,70 @@ function generateHashes() {
 // UUID Generator
 function generateUUID() {
     const uuid = crypto.randomUUID();
+    const compactUUID = uuid.replace(/-/g, '').toUpperCase();
+    
     document.getElementById('uuid-output').value = uuid;
+    document.getElementById('uuid-compact-output').value = compactUUID;
 }
 
 function generateMultipleUUIDs() {
     const uuids = [];
+    const compactUUIDs = [];
+    
     for (let i = 0; i < 10; i++) {
-        uuids.push(crypto.randomUUID());
+        const uuid = crypto.randomUUID();
+        uuids.push(uuid);
+        compactUUIDs.push(uuid.replace(/-/g, '').toUpperCase());
     }
+    
     document.getElementById('uuid-output').value = uuids.join('\n');
+    document.getElementById('uuid-compact-output').value = compactUUIDs.join('\n');
+}
+
+// Convert standard UUID to compact format
+function convertToCompact() {
+    const input = document.getElementById('uuid-output').value;
+    if (!input.trim()) {
+        document.getElementById('uuid-compact-output').value = '';
+        return;
+    }
+    
+    // Process line by line
+    const lines = input.split('\n');
+    const compactLines = lines.map(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return '';
+        // Remove hyphens and convert to uppercase
+        return trimmed.replace(/-/g, '').toUpperCase();
+    });
+    
+    document.getElementById('uuid-compact-output').value = compactLines.join('\n');
+}
+
+// Convert compact UUID to standard format
+function convertToStandard() {
+    const input = document.getElementById('uuid-compact-output').value;
+    if (!input.trim()) {
+        document.getElementById('uuid-output').value = '';
+        return;
+    }
+    
+    // Process line by line
+    const lines = input.split('\n');
+    const standardLines = lines.map(line => {
+        const trimmed = line.trim().replace(/-/g, '').toLowerCase();
+        if (!trimmed) return '';
+        
+        // Check if it's a valid 32-character hex string
+        if (trimmed.length !== 32 || !/^[0-9a-f]{32}$/i.test(trimmed)) {
+            return line; // Return original if invalid
+        }
+        
+        // Insert hyphens at correct positions: 8-4-4-4-12
+        return `${trimmed.substr(0, 8)}-${trimmed.substr(8, 4)}-${trimmed.substr(12, 4)}-${trimmed.substr(16, 4)}-${trimmed.substr(20, 12)}`;
+    });
+    
+    document.getElementById('uuid-output').value = standardLines.join('\n');
 }
 
 // Timestamp Converter

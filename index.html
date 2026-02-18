@@ -234,10 +234,20 @@
                     <div class="button-group">
                         <button onclick="generateUUID()">Generate UUID v4</button>
                         <button onclick="generateMultipleUUIDs()">Generate 10 UUIDs</button>
-                        <button onclick="clearInput('uuid-output')">Clear</button>
+                        <button onclick="clearInput('uuid-output', 'uuid-compact-output')">Clear</button>
                     </div>
-                    <textarea id="uuid-output" readonly placeholder="Generated UUIDs will appear here..."></textarea>
-                    <button class="copy-btn" onclick="copyToClipboard('uuid-output')">Copy Result</button>
+                    <div class="uuid-outputs">
+                        <div class="uuid-format-section">
+                            <h3>Standard UUID (with hyphens)</h3>
+                            <textarea id="uuid-output" placeholder="Enter UUID or generate one..." oninput="convertToCompact()"></textarea>
+                            <button class="copy-btn" onclick="copyToClipboard('uuid-output')">Copy</button>
+                        </div>
+                        <div class="uuid-format-section">
+                            <h3>Compact Format (32 chars, uppercase)</h3>
+                            <textarea id="uuid-compact-output" placeholder="Enter compact UUID or generate one..." oninput="convertToStandard()"></textarea>
+                            <button class="copy-btn" onclick="copyToClipboard('uuid-compact-output')">Copy</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
