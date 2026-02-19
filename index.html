@@ -20,16 +20,15 @@
         </header>
 
         <nav class="tool-nav">
-            <button class="tool-btn active" data-tool="url-encoder">URL Encoder/Decoder</button>
-            <button class="tool-btn" data-tool="json-formatter">JSON Formatter</button>
-            <button class="tool-btn" data-tool="json-visualizer">JSON Visualizer</button>
-            <button class="tool-btn" data-tool="xml-formatter">XML Formatter</button>
-            <button class="tool-btn" data-tool="jwt-decoder">JWT Decoder</button>
-            <button class="tool-btn" data-tool="base64">Base64 Encoder/Decoder</button>
-            <button class="tool-btn" data-tool="hash-generator">Hash Generator</button>
-            <button class="tool-btn" data-tool="uuid-generator">UUID Generator</button>
-            <button class="tool-btn" data-tool="timestamp-converter">Timestamp Converter</button>
-            <button class="tool-btn" data-tool="color-converter">Color Converter</button>
+            <button class="tool-btn active" data-tool="url-encoder">URL</button>
+            <button class="tool-btn" data-tool="json-tool">JSON</button>
+            <button class="tool-btn" data-tool="xml-formatter">XML</button>
+            <button class="tool-btn" data-tool="jwt-decoder">JWT</button>
+            <button class="tool-btn" data-tool="base64">Base64</button>
+            <button class="tool-btn" data-tool="hash-generator">Hash</button>
+            <button class="tool-btn" data-tool="uuid-generator">UUID</button>
+            <button class="tool-btn" data-tool="timestamp-converter">Timestamp</button>
+            <button class="tool-btn" data-tool="color-converter">Color</button>
         </nav>
 
         <main class="tool-container">
@@ -56,55 +55,64 @@
                 </div>
             </div>
 
-            <!-- JSON Formatter -->
-            <div class="tool-panel" id="json-formatter">
-                <h2>JSON Formatter</h2>
-                <div class="button-group">
-                    <button onclick="formatJSON()">Format (Pretty)</button>
-                    <button onclick="minifyJSON()">Minify</button>
-                    <button onclick="validateJSON()">Validate</button>
-                    <button onclick="clearInput('json-input', 'json-output')">Clear</button>
-                    <button class="copy-btn" onclick="copyToClipboard('json-output')">Copy Result</button>
-                    <div class="indent-control">
-                        <label>Indent Size:</label>
-                        <input type="number" id="json-indent" value="2" min="1" max="8">
-                    </div>
+            <!-- JSON Tool (Formatter + Visualizer) -->
+            <div class="tool-panel" id="json-tool">
+                <h2>JSON Formatter & Visualizer</h2>
+                
+                <!-- Sub-tabs for Format and Visualize -->
+                <div class="sub-tabs">
+                    <button class="sub-tab-btn active" data-subtab="format">Format</button>
+                    <button class="sub-tab-btn" data-subtab="visualize">Visualize</button>
                 </div>
-                <div id="json-validation" class="validation-message"></div>
-                <div class="tool-content">
-                    <div class="tool-split-view">
-                        <div class="tool-input-panel">
-                            <h3>Input</h3>
-                            <textarea id="json-input" placeholder='Enter JSON here... e.g., {"name":"John","age":30}'></textarea>
-                        </div>
-                        <div class="tool-output-panel">
-                            <h3>Output</h3>
-                            <textarea id="json-output" readonly placeholder="Formatted JSON will appear here..."></textarea>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- JSON Visualizer -->
-            <div class="tool-panel" id="json-visualizer">
-                <h2>JSON Visualizer</h2>
-                <div class="button-group">
-                    <button onclick="visualizeJSON()">Visualize</button>
-                    <button onclick="expandAllJSON()">Expand All</button>
-                    <button onclick="collapseAllJSON()">Collapse All</button>
-                    <button onclick="copyVisualizedJSON()">Copy as JSON</button>
-                    <button onclick="clearInput('json-viz-input', 'json-viz-output')">Clear</button>
-                </div>
-                <div id="json-viz-validation" class="validation-message"></div>
-                <div class="tool-content">
-                    <div class="tool-split-view">
-                        <div class="tool-input-panel">
-                            <h3>Input</h3>
-                            <textarea id="json-viz-input" placeholder='Enter JSON to visualize... e.g., {"users":[{"name":"John","age":30}]}'></textarea>
+                <!-- Format Tab Content -->
+                <div class="sub-tab-content active" id="format-tab">
+                    <div class="button-group">
+                        <button onclick="formatJSON()">Format (Pretty)</button>
+                        <button onclick="minifyJSON()">Minify</button>
+                        <button onclick="validateJSON()">Validate</button>
+                        <button onclick="clearInput('json-input', 'json-output')">Clear</button>
+                        <button class="copy-btn" onclick="copyToClipboard('json-output')">Copy Result</button>
+                        <div class="indent-control">
+                            <label>Indent Size:</label>
+                            <input type="number" id="json-indent" value="2" min="1" max="8">
                         </div>
-                        <div class="tool-output-panel">
-                            <h3>Interactive Tree View</h3>
-                            <div id="json-viz-output" class="json-tree"></div>
+                    </div>
+                    <div id="json-validation" class="validation-message"></div>
+                    <div class="tool-content">
+                        <div class="tool-split-view">
+                            <div class="tool-input-panel">
+                                <h3>Input</h3>
+                                <textarea id="json-input" placeholder='Enter JSON here... e.g., {"name":"John","age":30}'></textarea>
+                            </div>
+                            <div class="tool-output-panel">
+                                <h3>Output</h3>
+                                <textarea id="json-output" readonly placeholder="Formatted JSON will appear here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualize Tab Content -->
+                <div class="sub-tab-content" id="visualize-tab">
+                    <div class="button-group">
+                        <button onclick="visualizeJSON()">Visualize</button>
+                        <button onclick="expandAllJSON()">Expand All</button>
+                        <button onclick="collapseAllJSON()">Collapse All</button>
+                        <button onclick="copyVisualizedJSON()">Copy as JSON</button>
+                        <button onclick="clearInput('json-viz-input', 'json-viz-output')">Clear</button>
+                    </div>
+                    <div id="json-viz-validation" class="validation-message"></div>
+                    <div class="tool-content">
+                        <div class="tool-split-view">
+                            <div class="tool-input-panel">
+                                <h3>Input</h3>
+                                <textarea id="json-viz-input" placeholder='Enter JSON to visualize... e.g., {"users":[{"name":"John","age":30}]}'></textarea>
+                            </div>
+                            <div class="tool-output-panel">
+                                <h3>Interactive Tree View</h3>
+                                <div id="json-viz-output" class="json-tree"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -231,8 +239,31 @@
             <div class="tool-panel" id="uuid-generator">
                 <h2>UUID Generator</h2>
                 <div class="tool-content">
+                    <div class="uuid-config">
+                        <div class="uuid-type-selector">
+                            <label for="uuid-version">UUID Version:</label>
+                            <select id="uuid-version" onchange="toggleNamespaceInput()">
+                                <option value="v1">v1 - Time-based</option>
+                                <option value="v4" selected>v4 - Random</option>
+                                <option value="v3">v3 - Name-based (MD5)</option>
+                                <option value="v5">v5 - Name-based (SHA-1)</option>
+                            </select>
+                        </div>
+                        <div id="namespace-input" class="namespace-input" style="display: none;">
+                            <label for="uuid-namespace">Namespace:</label>
+                            <select id="uuid-namespace">
+                                <option value="dns">DNS (6ba7b810-9dad-11d1-80b4-00c04fd430c8)</option>
+                                <option value="url">URL (6ba7b811-9dad-11d1-80b4-00c04fd430c8)</option>
+                                <option value="oid">OID (6ba7b812-9dad-11d1-80b4-00c04fd430c8)</option>
+                                <option value="x500">X.500 (6ba7b814-9dad-11d1-80b4-00c04fd430c8)</option>
+                                <option value="custom">Custom UUID</option>
+                            </select>
+                            <input type="text" id="custom-namespace" placeholder="Custom namespace UUID" style="display: none;">
+                            <input type="text" id="uuid-name" placeholder="Enter name (e.g., example.com)">
+                        </div>
+                    </div>
                     <div class="button-group">
-                        <button onclick="generateUUID()">Generate UUID v4</button>
+                        <button onclick="generateUUIDByVersion()">Generate UUID</button>
                         <button onclick="generateMultipleUUIDs()">Generate 10 UUIDs</button>
                         <button onclick="clearInput('uuid-output', 'uuid-compact-output')">Clear</button>
                     </div>

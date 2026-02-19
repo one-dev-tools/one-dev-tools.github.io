@@ -17,6 +17,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Sub-tab navigation for merged tools
+    const subTabButtons = document.querySelectorAll('.sub-tab-btn');
+    subTabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const subtabId = button.getAttribute('data-subtab');
+            const parentTool = button.closest('.tool-panel');
+            
+            // Update active sub-tab button
+            parentTool.querySelectorAll('.sub-tab-btn').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Show corresponding sub-tab content
+            parentTool.querySelectorAll('.sub-tab-content').forEach(content => content.classList.remove('active'));
+            parentTool.querySelector(`#${subtabId}-tab`).classList.add('active');
+        });
+    });
+
     // Initialize timestamp converter with current time
     updateCurrentTime();
     setInterval(updateCurrentTime, 1000);
@@ -709,6 +726,7 @@ function generateHashes() {
 }
 
 // UUID Generator
+// UUID Generator
 function generateUUID() {
     const uuid = crypto.randomUUID();
     const compactUUID = uuid.replace(/-/g, '').toUpperCase();
@@ -717,12 +735,154 @@ function generateUUID() {
     document.getElementById('uuid-compact-output').value = compactUUID;
 }
 
+// Generate UUID v1 (Time-based)
+function generateUUIDv1() {
+    const now = Date.now();
+    const timeHex = (now * 10000 + 0x01B21DD213814000).toString(16).padStart(16, '0');
+    
+    // Extract time components
+    const timeLow = timeHex.substr(-8);
+    const timeMid = timeHex.substr(-12, 4);
+    const timeHi = '1' + timeHex.substr(-15, 3); // Version 1
+    
+    // Generate random clock sequence and node
+    const clockSeq = crypto.getRandomValues(new Uint8Array(2));
+    clockSeq[0] = (clockSeq[0] & 0x3f) | 0x80; // Set variant bits
+    
+    const node = crypto.getRandomValues(new Uint8Array(6));
+    
+    const uuid = [
+        timeLow,
+        timeMid,
+        timeHi,
+        Array.from(clockSeq).map(b => b.toString(16).padStart(2, '0')).join(''),
+        Array.from(node).map(b => b.toString(16).padStart(2, '0')).join('')
+    ].join('-');
+    
+    return uuid;
+}
+
+// Generate UUID v3 or v5 (Name-based)
+async function generateNameBasedUUID(version, namespace, name) {
+    const namespaceUUIDs = {
+        'dns': '6ba7b810-9dad-11d1-80b4-00c04fd430c8',
+        'url': '6ba7b811-9dad-11d1-80b4-00c04fd430c8',
+        'oid': '6ba7b812-9dad-11d1-80b4-00c04fd430c8',
+        'x500': '6ba7b814-9dad-11d1-80b4-00c04fd430c8'
+    };
+    
+    const namespaceUUID = namespaceUUIDs[namespace] || namespace;
+    const namespaceBytes = namespaceUUID.replace(/-/g, '').match(/.{2}/g).map(h => parseInt(h, 16));
+    const nameBytes = new TextEncoder().encode(name);
+    
+    // Combine namespace and name
+    const data = new Uint8Array([...namespaceBytes, ...nameBytes]);
+    
+    // Hash the data
+    const hashAlgorithm = version === 'v3' ? 'SHA-1' : 'SHA-256';
+    const hashBuffer = await crypto.subtle.digest(hashAlgorithm, data);
+    const hashArray = new Uint8Array(hashBuffer);
+    
+    // Format as UUID
+    const hex = Array.from(hashArray.slice(0, 16)).map(b => b.toString(16).padStart(2, '0')).join('');
+    
+    // Set version and variant bits
+    const versionBit = version === 'v3' ? '3' : '5';
+    const uuid = [
+        hex.substr(0, 8),
+        hex.substr(8, 4),
+        versionBit + hex.substr(13, 3),
+        ((parseInt(hex.substr(16, 2), 16) & 0x3f) | 0x80).toString(16).padStart(2, '0') + hex.substr(18, 2),
+        hex.substr(20, 12)
+    ].join('-');
+    
+    return uuid;
+}
+
+// Toggle namespace input visibility
+function toggleNamespaceInput() {
+    const version = document.getElementById('uuid-version').value;
+    const namespaceInput = document.getElementById('namespace-input');
+    
+    if (version === 'v3' || version === 'v5') {
+        namespaceInput.style.display = 'flex';
+    } else {
+        namespaceInput.style.display = 'none';
+    }
+}
+
+// Toggle custom namespace input
+document.addEventListener('DOMContentLoaded', () => {
+    const namespaceSelect = document.getElementById('uuid-namespace');
+    const customNamespace = document.getElementById('custom-namespace');
+    
+    if (namespaceSelect) {
+        namespaceSelect.addEventListener('change', () => {
+            if (namespaceSelect.value === 'custom') {
+                customNamespace.style.display = 'block';
+            } else {
+                customNamespace.style.display = 'none';
+            }
+        });
+    }
+});
+
+// Generate UUID based on selected version
+async function generateUUIDByVersion() {
+    const version = document.getElementById('uuid-version').value;
+    let uuid;
+    
+    try {
+        if (version === 'v1') {
+            uuid = generateUUIDv1();
+        } else if (version === 'v4') {
+            uuid = crypto.randomUUID();
+        } else if (version === 'v3' || version === 'v5') {
+            const namespaceSelect = document.getElementById('uuid-namespace').value;
+            const namespace = namespaceSelect === 'custom' 
+                ? document.getElementById('custom-namespace').value 
+                : namespaceSelect;
+            const name = document.getElementById('uuid-name').value;
+            
+            if (!name) {
+                showNotification('Please enter a name for UUID generation', 'error');
+                return;
+            }
+            
+            if (namespaceSelect === 'custom' && !namespace) {
+                showNotification('Please enter a custom namespace UUID', 'error');
+                return;
+            }
+            
+            uuid = await generateNameBasedUUID(version, namespace, name);
+        }
+        
+        const compactUUID = uuid.replace(/-/g, '').toUpperCase();
+        document.getElementById('uuid-output').value = uuid;
+        document.getElementById('uuid-compact-output').value = compactUUID;
+    } catch (error) {
+        showNotification('Error generating UUID: ' + error.message, 'error');
+    }
+}
+
 function generateMultipleUUIDs() {
+    const version = document.getElementById('uuid-version').value;
+    
+    if (version === 'v3' || version === 'v5') {
+        showNotification('Multiple UUID generation not supported for name-based UUIDs. Generate one at a time.', 'error');
+        return;
+    }
+    
     const uuids = [];
     const compactUUIDs = [];
     
     for (let i = 0; i < 10; i++) {
-        const uuid = crypto.randomUUID();
+        let uuid;
+        if (version === 'v1') {
+            uuid = generateUUIDv1();
+        } else {
+            uuid = crypto.randomUUID();
+        }
         uuids.push(uuid);
         compactUUIDs.push(uuid.replace(/-/g, '').toUpperCase());
     }
