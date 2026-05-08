@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dev Tools - Developer Utilities</title>
-    <meta name="description" content="Developer tools including URL encoder/decoder, JSON formatter, XML formatter, JWT decoder, Base64 encoder, hash generator, UUID generator, timestamp converter, and color converter.">
+    <meta name="description" content="Developer tools including URL encoder/decoder, JSON formatter, YAML formatter, XML formatter, JWT decoder, Base64 encoder, hash generator, UUID generator, timestamp converter, and color converter.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
@@ -23,6 +23,7 @@
             <button class="tool-btn active" data-tool="url-encoder">URL</button>
             <button class="tool-btn" data-tool="json-tool">JSON</button>
             <button class="tool-btn" data-tool="xml-formatter">XML</button>
+            <button class="tool-btn" data-tool="yaml-formatter">YAML</button>
             <button class="tool-btn" data-tool="jwt-decoder">JWT</button>
             <button class="tool-btn" data-tool="base64">Base64</button>
             <button class="tool-btn" data-tool="hash-generator">Hash</button>
@@ -142,6 +143,34 @@
                         <div class="tool-output-panel">
                             <h3>Output</h3>
                             <textarea id="xml-output" readonly placeholder="Formatted XML will appear here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- YAML Formatter -->
+            <div class="tool-panel" id="yaml-formatter">
+                <h2>YAML Formatter</h2>
+                <div class="button-group">
+                    <button onclick="formatYAML()">Format (Pretty)</button>
+                    <button onclick="validateYAML()">Validate</button>
+                    <button onclick="clearInput('yaml-input', 'yaml-output')">Clear</button>
+                    <button class="copy-btn" onclick="copyToClipboard('yaml-output')">Copy Result</button>
+                    <div class="indent-control">
+                        <label>Indent Size:</label>
+                        <input type="number" id="yaml-indent" value="2" min="1" max="8">
+                    </div>
+                </div>
+                <div id="yaml-validation" class="validation-message"></div>
+                <div class="tool-content">
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>Input</h3>
+                            <textarea id="yaml-input" placeholder="Enter YAML here... e.g., name: John\nage: 30"></textarea>
+                        </div>
+                        <div class="tool-output-panel">
+                            <h3>Output</h3>
+                            <textarea id="yaml-output" readonly placeholder="Formatted YAML will appear here..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -363,10 +392,11 @@
 
         <footer>
             <p>Dev Tools - All processing happens locally in your browser. Your data never leaves your device.</p>
-            <p>© 2026 | <a href="https://github.tools.sap/I076157/dev-tools" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>
+            <p>© 2026 | <a href="https://github.com/one-dev-tools/one-dev-tools.github.io" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>
         </footer>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script src="app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </body>

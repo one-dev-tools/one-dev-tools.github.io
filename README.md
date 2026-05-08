@@ -60,7 +60,7 @@ A collection of essential developer utilities that run entirely in your browser.
 
 1. Clone this repository:
 ```bash
-git clone https://github.tools.sap/I076157/dev-tools.git
+git clone https://github.com/one-dev-tools/one-dev-tools.github.io.git
 cd dev-tools
 ```
 
@@ -75,26 +75,26 @@ xdg-open index.html  # Linux
 
 That's it! No build process, no dependencies to install.
 
-### Deploy to SAP GitHub Pages
+### Deploy to GitHub Pages
 
-1. **Push your code to SAP GitHub:**
+1. **Push your code to GitHub:**
 ```bash
 git add .
 git commit -m "Initial commit: Dev Tools website"
 git branch -M main
-git remote add origin https://github.tools.sap/I076157/dev-tools.git
+git remote add origin https://github.com/one-dev-tools/one-dev-tools.github.io.git
 git push -u origin main
 ```
 
 2. **Enable GitHub Pages:**
-   - Go to your repository on SAP GitHub
+   - Go to your repository on GitHub
    - Click on **Settings**
    - Scroll down to **Pages** in the left sidebar
    - Under **Source**, select **main** branch and **/ (root)** folder
    - Click **Save**
 
 3. **Access your site:**
-   - Your site will be available at your SAP GitHub Pages URL
+   - Your site will be available at your GitHub Pages URL
    - It may take a few minutes for the site to become available
 
 ## 📁 Project Structure
@@ -154,7 +154,7 @@ Potential tools to add:
 
 ## 👤 Author
 
-I076157 - [SAP GitHub Profile](https://github.tools.sap/I076157)
+One Dev Tools - [GitHub Profile](https://github.com/one-dev-tools/one-dev-tools.github.io)
 
 ## 🙏 Acknowledgments
 

@@ -550,6 +550,38 @@ function validateXML() {
     }
 }
 
+// YAML Formatter
+function formatYAML() {
+    const input = document.getElementById('yaml-input').value;
+    const indent = parseInt(document.getElementById('yaml-indent').value) || 2;
+    const validation = document.getElementById('yaml-validation');
+
+    try {
+        const parsed = jsyaml.load(input);
+        const formatted = jsyaml.dump(parsed, { indent });
+        document.getElementById('yaml-output').value = formatted;
+        validation.textContent = '✓ Valid YAML';
+        validation.className = 'validation-message success';
+    } catch (error) {
+        validation.textContent = '✗ Invalid YAML: ' + error.message;
+        validation.className = 'validation-message error';
+    }
+}
+
+function validateYAML() {
+    const input = document.getElementById('yaml-input').value;
+    const validation = document.getElementById('yaml-validation');
+
+    try {
+        jsyaml.load(input);
+        validation.textContent = '✓ Valid YAML';
+        validation.className = 'validation-message success';
+    } catch (error) {
+        validation.textContent = '✗ Invalid YAML: ' + error.message;
+        validation.className = 'validation-message error';
+    }
+}
+
 // JWT Decoder
 function decodeJWT() {
     const input = document.getElementById('jwt-input').value.trim();
