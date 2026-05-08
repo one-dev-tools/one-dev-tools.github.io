@@ -1,4 +1,4 @@
-# 🛠️ Dev Tools
+# 🛠️ One Dev Tools
 
 A collection of essential developer utilities that run entirely in your browser. All processing happens locally - your data never leaves your device.
 
@@ -80,7 +80,7 @@ That's it! No build process, no dependencies to install.
 1. **Push your code to GitHub:**
 ```bash
 git add .
-git commit -m "Initial commit: Dev Tools website"
+git commit -m "Initial commit: One Dev Tools website"
 git branch -M main
 git remote add origin https://github.com/one-dev-tools/one-dev-tools.github.io.git
 git push -u origin main
