@@ -78,20 +78,21 @@ describe('SQL — tokenizeSQL', () => {
 });
 
 describe('SQL — validateSQL (logic)', () => {
-    // validateSQL reads from the DOM, so we stub getElementById for these tests
+    // validateSQL reads from the DOM — stub getElementById once, restore after each check
+    const _orig = document.getElementById.bind(document);
     const stub = (val) => {
-        const orig = document.getElementById.bind(document);
         document.getElementById = (id) => {
-            if (id === 'sql-input') return { value: val };
+            if (id === 'sql-input')      return { value: val };
             if (id === 'sql-validation') return { textContent: '', className: '' };
-            return orig(id);
+            return _orig(id);
         };
     };
-    const restore = () => { document.getElementById = document.getElementById.__orig || document.getElementById; };
+    const restore = () => { document.getElementById = _orig; };
 
     const check = (sql) => {
         stub(sql);
         const r = validateSQL(false);
+        restore();
         return r;
     };
 

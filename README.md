@@ -2,8 +2,7 @@
 
 A collection of essential developer utilities that run entirely in your browser. No server, no tracking, no build step — open `index.html` and go.
 
-> **A screenshot of the interface would be a useful addition here.** If you can drop one in as `screenshot.png`, add `![One Dev Tools](screenshot.png)` below this line.
-
+![One Dev Tools](./imgs/preview.png)
 ---
 
 ## Tools

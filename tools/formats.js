@@ -528,9 +528,8 @@ function validateSQL(standalone = false) {
     }
 
     const errors  = [];
-    const strRe   = /('([^'\\]|\\.)*'|"([^"\\]|\\.)*"|`([^`\\]|\\.)*`)/g;
-    const stripped = input.replace(strRe, '""').replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
-
+    const strRe    = /('([^'\\]|\\.)*'|"([^"\\]|\\.)*"|`([^`\\]|\\.)*`)/g;
+    const stripped = input.replace(strRe, '__STR__').replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
     if (stripped.match(/['"`]/))  errors.push('Unterminated string literal');
     if (/\/\*/.test(stripped))    errors.push('Unclosed block comment');
 
