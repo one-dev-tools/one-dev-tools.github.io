@@ -1761,6 +1761,8 @@ function validateSQL(standalone = false) {
             expectComma = true;
         }
     });
+
+    if (errors.length > 0) {
         validation.textContent = '✗ ' + errors[0] + (errors.length > 1 ? ` (+${errors.length - 1} more)` : '');
         validation.className = 'validation-message error';
         return { ok: false, errors };
