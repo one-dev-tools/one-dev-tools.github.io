@@ -26,8 +26,14 @@
         </div>
 
         <nav class="tool-nav">
+            <div class="nav-group-label">Personal</div>
+            <button class="tool-btn active" data-tool="todo-list" data-group="personal">
+                <span class="tool-label">To-Do</span>
+                <span class="tool-hint">tasks · local storage</span>
+            </button>
+
             <div class="nav-group-label">Encode / Decode</div>
-            <button class="tool-btn active" data-tool="base64" data-group="encode">
+            <button class="tool-btn" data-tool="base64" data-group="encode">
                 <span class="tool-label">Base64</span>
                 <span class="tool-hint">encode / decode</span>
             </button>
@@ -101,12 +107,7 @@
                 <span class="tool-label">Markdown</span>
                 <span class="tool-hint">preview rendered output</span>
             </button>
-
-            <div class="nav-group-label">Personal</div>
-            <button class="tool-btn" data-tool="todo-list" data-group="personal">
-                <span class="tool-label">To-Do</span>
-                <span class="tool-hint">tasks · local storage</span>
-            </button>
+        </nav>
         </nav>
 
         <div class="sidebar-footer">
@@ -293,7 +294,7 @@
             </div>
 
             <!-- Base64 Encoder/Decoder -->
-            <div class="tool-panel active" id="base64">
+            <div class="tool-panel" id="base64">
                 <h2>Base64 Encoder / Decoder</h2>
                 <div class="button-group">
                     <button onclick="encodeBase64()">Encode</button>
@@ -741,7 +742,7 @@
             </div>
 
             <!-- To-Do List -->
-            <div class="tool-panel" id="todo-list">
+            <div class="tool-panel active" id="todo-list">
                 <h2>To-Do</h2>
                 <div class="todo-input-row">
                     <textarea id="todo-input" placeholder="Add a task… (Enter to add, Shift+Enter for new line)" rows="2" autocomplete="off"></textarea>
