@@ -1857,3 +1857,186 @@ function minifySQL() {
     validation.textContent = `✓ Valid SQL — minified, ${stmtCount} statement${stmtCount !== 1 ? 's' : ''}`;
     validation.className = 'validation-message success';
 }
+
+// Regex Tester
+function runRegex() {
+    const patternVal = document.getElementById('regex-pattern').value;
+    const flagsVal   = document.getElementById('regex-flags').value.trim();
+    const input      = document.getElementById('regex-input').value;
+    const errorEl    = document.getElementById('regex-pattern-error');
+    const matchPanel = document.getElementById('regex-match-panel');
+    const hlEl       = document.getElementById('regex-highlighted');
+
+    if (!patternVal) {
+        errorEl.textContent = '';
+        errorEl.className = 'validation-message';
+        matchPanel.innerHTML = '<div class="regex-empty">Enter a pattern and test string to see matches.</div>';
+        hlEl.innerHTML = '';
+        return;
+    }
+
+    let regex;
+    try {
+        regex = new RegExp(patternVal, flagsVal);
+        errorEl.textContent = '';
+        errorEl.className = 'validation-message';
+    } catch (e) {
+        errorEl.textContent = '✗ ' + e.message;
+        errorEl.className = 'validation-message error';
+        matchPanel.innerHTML = '';
+        hlEl.innerHTML = '';
+        return;
+    }
+
+    if (!input) {
+        matchPanel.innerHTML = '<div class="regex-empty">Enter a test string to see matches.</div>';
+        hlEl.innerHTML = '';
+        return;
+    }
+
+    const isGlobal = flagsVal.includes('g') || flagsVal.includes('y');
+    const matches = [];
+
+    if (isGlobal) {
+        let m;
+        regex.lastIndex = 0;
+        while ((m = regex.exec(input)) !== null) {
+            matches.push(m);
+            if (!flagsVal.includes('g') && !flagsVal.includes('y')) break;
+            if (m[0].length === 0) regex.lastIndex++;
+        }
+    } else {
+        const m = regex.exec(input);
+        if (m) matches.push(m);
+    }
+
+    // Match list
+    if (matches.length === 0) {
+        matchPanel.innerHTML = '<div class="regex-no-match">No matches found.</div>';
+    } else {
+        const total = matches.length;
+        matchPanel.innerHTML = matches.map((m, i) => {
+            const groups = m.slice(1);
+            const groupsHtml = groups.length
+                ? `<div class="regex-match-groups">${groups.map((g, gi) =>
+                    `Group ${gi + 1}: <strong>${g === undefined ? '<em>undefined</em>' : escapeHtml(g)}</strong>`
+                  ).join(' &nbsp;·&nbsp; ')}</div>`
+                : '';
+            return `<div class="regex-match-item">
+                <div class="regex-match-header">
+                    <span>Match <strong>${i + 1} / ${total}</strong></span>
+                    <span>index <strong>${m.index}</strong></span>
+                    <span>length <strong>${m[0].length}</strong></span>
+                </div>
+                <div class="regex-match-value">${escapeHtml(m[0])}</div>
+                ${groupsHtml}
+            </div>`;
+        }).join('');
+    }
+
+    // Highlighted text
+    if (matches.length === 0) {
+        hlEl.innerHTML = '';
+        return;
+    }
+
+    let highlighted = '';
+    let lastIndex = 0;
+    matches.forEach(m => {
+        highlighted += escapeHtml(input.slice(lastIndex, m.index));
+        highlighted += `<mark class="regex-hl">${escapeHtml(m[0])}</mark>`;
+        lastIndex = m.index + m[0].length;
+    });
+    highlighted += escapeHtml(input.slice(lastIndex));
+    hlEl.innerHTML = highlighted;
+}
+
+function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Markdown Preview
+function renderMarkdown() {
+    const src = document.getElementById('markdown-input').value;
+    const out = document.getElementById('markdown-output');
+    out.innerHTML = parseMarkdown(src);
+}
+
+function parseMarkdown(src) {
+    let html = src
+        // Escape HTML in source
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
+    // Fenced code blocks (``` lang \n ... ```)
+    html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
+        `<pre><code>${code.trimEnd()}</code></pre>`);
+
+    // Headings
+    html = html.replace(/^#{6} (.+)$/gm, '<h6>$1</h6>');
+    html = html.replace(/^#{5} (.+)$/gm, '<h5>$1</h5>');
+    html = html.replace(/^#{4} (.+)$/gm, '<h4>$1</h4>');
+    html = html.replace(/^#{3} (.+)$/gm, '<h3>$1</h3>');
+    html = html.replace(/^#{2} (.+)$/gm, '<h2>$1</h2>');
+    html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+
+    // Horizontal rule
+    html = html.replace(/^(---|\*\*\*|___)\s*$/gm, '<hr>');
+
+    // Blockquotes
+    html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+
+    // Unordered lists
+    html = html.replace(/(^[*\-+] .+(\n[*\-+] .+)*)/gm, match => {
+        const items = match.trim().split('\n').map(l => `<li>${l.replace(/^[*\-+] /, '')}</li>`).join('');
+        return `<ul>${items}</ul>`;
+    });
+
+    // Ordered lists
+    html = html.replace(/(^\d+\. .+(\n\d+\. .+)*)/gm, match => {
+        const items = match.trim().split('\n').map(l => `<li>${l.replace(/^\d+\. /, '')}</li>`).join('');
+        return `<ol>${items}</ol>`;
+    });
+
+    // Tables
+    html = html.replace(/(\|.+\|\n\|[-| :]+\|\n(?:\|.+\|\n?)+)/g, match => {
+        const rows = match.trim().split('\n');
+        const headers = rows[0].split('|').filter(c => c.trim()).map(c => `<th>${c.trim()}</th>`).join('');
+        const body = rows.slice(2).map(row => {
+            const cells = row.split('|').filter(c => c.trim()).map(c => `<td>${c.trim()}</td>`).join('');
+            return `<tr>${cells}</tr>`;
+        }).join('');
+        return `<table><thead><tr>${headers}</tr></thead><tbody>${body}</tbody></table>`;
+    });
+
+    // Inline code
+    html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+    // Bold + italic
+    html = html.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+    html = html.replace(/___(.+?)___/g, '<strong><em>$1</em></strong>');
+    // Bold
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    html = html.replace(/__(.+?)__/g, '<strong>$1</strong>');
+    // Italic
+    html = html.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    html = html.replace(/_(.+?)_/g, '<em>$1</em>');
+    // Strikethrough
+    html = html.replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+    // Images (before links)
+    html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1">');
+    // Links
+    html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+
+    // Paragraphs — wrap double-newline-separated blocks not already wrapped in a block tag
+    html = html.split(/\n{2,}/).map(block => {
+        const trimmed = block.trim();
+        if (!trimmed) return '';
+        if (/^<(h[1-6]|ul|ol|li|pre|blockquote|table|hr)/.test(trimmed)) return trimmed;
+        return `<p>${trimmed.replace(/\n/g, '<br>')}</p>`;
+    }).join('\n');
+
+    return html;
+}

@@ -93,6 +93,14 @@
                 <span class="tool-label">String Case</span>
                 <span class="tool-hint">camel · snake · kebab…</span>
             </button>
+            <button class="tool-btn" data-tool="regex-tester" data-group="utility">
+                <span class="tool-label">Regex</span>
+                <span class="tool-hint">test · match · flags</span>
+            </button>
+            <button class="tool-btn" data-tool="markdown-preview" data-group="utility">
+                <span class="tool-label">Markdown</span>
+                <span class="tool-hint">preview rendered output</span>
+            </button>
         </nav>
 
         <div class="sidebar-footer">
@@ -668,6 +676,59 @@
                         <div class="tool-output-panel">
                             <h3>Output</h3>
                             <textarea id="sql-output" readonly placeholder="Formatted SQL will appear here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Regex Tester -->
+            <div class="tool-panel" id="regex-tester">
+                <h2>Regex Tester</h2>
+                <div class="regex-controls">
+                    <div class="regex-pattern-row">
+                        <span class="regex-slash">/</span>
+                        <input type="text" id="regex-pattern" placeholder="pattern" oninput="runRegex()" spellcheck="false">
+                        <span class="regex-slash">/</span>
+                        <input type="text" id="regex-flags" placeholder="flags" value="g" oninput="runRegex()" spellcheck="false" maxlength="8">
+                    </div>
+                    <div id="regex-pattern-error" class="validation-message"></div>
+                </div>
+                <div class="tool-content">
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>Test string</h3>
+                            <textarea id="regex-input" placeholder="Enter text to test against..." oninput="runRegex()"></textarea>
+                        </div>
+                        <div class="tool-output-panel">
+                            <h3>Matches</h3>
+                            <div class="regex-match-panel" id="regex-match-panel">
+                                <div class="regex-empty">Enter a pattern and test string to see matches.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="regex-highlighted-label">
+                        <h3>Highlighted</h3>
+                    </div>
+                    <div class="regex-highlighted" id="regex-highlighted"></div>
+                </div>
+            </div>
+
+            <!-- Markdown Preview -->
+            <div class="tool-panel" id="markdown-preview">
+                <h2>Markdown Preview</h2>
+                <div class="button-group">
+                    <button onclick="clearInput('markdown-input'); renderMarkdown()">Clear</button>
+                    <button class="copy-btn" onclick="copyToClipboard('markdown-input')">Copy source</button>
+                </div>
+                <div class="tool-content">
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>Markdown source</h3>
+                            <textarea id="markdown-input" placeholder="# Hello&#10;&#10;Type **Markdown** here and see a live preview on the right." oninput="renderMarkdown()"></textarea>
+                        </div>
+                        <div class="tool-output-panel">
+                            <h3>Preview</h3>
+                            <div class="markdown-preview-pane" id="markdown-output"></div>
                         </div>
                     </div>
                 </div>
