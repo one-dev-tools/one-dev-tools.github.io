@@ -101,6 +101,12 @@
                 <span class="tool-label">Markdown</span>
                 <span class="tool-hint">preview rendered output</span>
             </button>
+
+            <div class="nav-group-label">Personal</div>
+            <button class="tool-btn" data-tool="todo-list" data-group="personal">
+                <span class="tool-label">To-Do</span>
+                <span class="tool-hint">tasks · local storage</span>
+            </button>
         </nav>
 
         <div class="sidebar-footer">
@@ -732,6 +738,25 @@
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- To-Do List -->
+            <div class="tool-panel" id="todo-list">
+                <h2>To-Do</h2>
+                <div class="todo-input-row">
+                    <textarea id="todo-input" placeholder="Add a task… (Enter to add, Shift+Enter for new line)" rows="2" autocomplete="off"></textarea>
+                    <button onclick="todoAdd()">Add</button>
+                </div>
+                <div class="todo-shortcuts">
+                    <span><kbd>Enter</kbd> add</span>
+                    <span><kbd>Shift+Enter</kbd> new line</span>
+                    <span><kbd>Space</kbd> toggle done</span>
+                    <span><kbd>Del</kbd> remove</span>
+                    <span><kbd>↑ ↓</kbd> navigate</span>
+                    <span><kbd>Double-click</kbd> edit</span>
+                </div>
+                <ul class="todo-list" id="todo-items"></ul>
+                <div class="todo-footer" id="todo-footer"></div>
             </div>
 
         </div><!-- /.main-inner -->

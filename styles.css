@@ -18,6 +18,8 @@
     --g-generate-dim: #E6EAF0;
     --g-utility:    #6B5C70;   /* soft mauve   — Utility       */
     --g-utility-dim: #EDE8EF;
+    --g-personal:   #7A6040;   /* warm brown   — Personal      */
+    --g-personal-dim: #F2EBE0;
 
     /* Keep accent pointing at encode group for shared components */
     --accent:       #5C7A6E;
@@ -181,6 +183,183 @@ body {
 .tool-btn[data-group="utility"]:hover      { background: var(--g-utility-dim); }
 .tool-btn[data-group="utility"].active     { color: var(--g-utility); background: var(--g-utility-dim); border-left-color: var(--g-utility); }
 .tool-btn[data-group="utility"].active .tool-hint { color: var(--g-utility); }
+
+.tool-btn[data-group="personal"]:hover     { background: var(--g-personal-dim); }
+.tool-btn[data-group="personal"].active    { color: var(--g-personal); background: var(--g-personal-dim); border-left-color: var(--g-personal); }
+.tool-btn[data-group="personal"].active .tool-hint { color: var(--g-personal); }
+
+/* ── To-Do List ──────────────────────────────────────────── */
+
+.todo-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+
+.todo-input-row textarea {
+    flex: 1;
+    padding: 9px 12px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--ink);
+    resize: none;
+    min-height: 42px;
+    max-height: 160px;
+    overflow-y: auto;
+    line-height: 1.5;
+}
+
+.todo-input-row textarea:focus {
+    outline: none;
+    border-color: var(--g-personal);
+}
+
+.todo-shortcuts {
+    display: flex;
+    gap: 16px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    padding: 4px 0;
+}
+
+.todo-shortcuts kbd {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    background: var(--surface-alt);
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1px 5px;
+    color: var(--ink-mid);
+}
+
+.todo-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 4px;
+}
+
+.todo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--surface);
+    cursor: pointer;
+    outline: none;
+    transition: background 0.12s, border-color 0.12s;
+    font-size: 14px;
+    color: var(--ink);
+}
+
+.todo-item:focus {
+    border-color: var(--g-personal);
+    background: var(--g-personal-dim);
+}
+
+.todo-item:hover {
+    background: var(--surface-alt);
+}
+
+.todo-item.done {
+    color: var(--ink-faint);
+    background: var(--surface-alt);
+}
+
+.todo-item.done .todo-text {
+    text-decoration: line-through;
+}
+
+.todo-check {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--rule);
+    border-radius: 3px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: transparent;
+    background: var(--surface);
+    transition: all 0.12s;
+}
+
+.todo-item.done .todo-check {
+    background: var(--g-personal);
+    border-color: var(--g-personal);
+    color: white;
+}
+
+.todo-text {
+    flex: 1;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+.todo-item-edit {
+    flex: 1;
+    width: 100%;
+    padding: 2px 4px;
+    border: 1px solid var(--g-personal);
+    border-radius: 2px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    line-height: 1.5;
+    background: var(--surface);
+    color: var(--ink);
+    resize: none;
+    outline: 2px solid rgba(122, 96, 64, 0.15);
+    min-height: 28px;
+}
+
+.todo-delete {
+    opacity: 0;
+    font-size: 16px;
+    color: var(--ink-faint);
+    background: none;
+    border: none;
+    padding: 0 2px;
+    cursor: pointer;
+    line-height: 1;
+    transition: opacity 0.12s, color 0.12s;
+    box-shadow: none;
+}
+
+.todo-item:hover .todo-delete,
+.todo-item:focus .todo-delete {
+    opacity: 1;
+}
+
+.todo-delete:hover {
+    color: var(--error);
+    background: none;
+    box-shadow: none;
+    transform: none;
+}
+
+.todo-footer {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    padding-top: 8px;
+    letter-spacing: 0.02em;
+}
+
+.todo-empty {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-style: italic;
+    padding: 20px 0 8px;
+}
 
 .sidebar-footer {
     padding: 14px 20px;
@@ -1334,6 +1513,12 @@ mark.regex-hl {
 
 #text-compare .tool-split-view {
     min-height: 0;
+}
+
+#text-compare .tool-split-view textarea {
+    min-height: 75vh;
+    height: 75vh;
+    max-height: 75vh;
 }
 
 .diff-summary {

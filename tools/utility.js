@@ -239,3 +239,153 @@ function parseMarkdown(src) {
 
     return html;
 }
+
+// ── To-Do List ────────────────────────────────────────────
+
+const TODO_KEY = 'onedevtools_todos';
+
+function todoLoad() {
+    try { return JSON.parse(localStorage.getItem(TODO_KEY)) || []; }
+    catch { return []; }
+}
+
+function todoSave(items) {
+    localStorage.setItem(TODO_KEY, JSON.stringify(items));
+}
+
+function todoRender() {
+    const items    = todoLoad();
+    const listEl   = document.getElementById('todo-items');
+    const footerEl = document.getElementById('todo-footer');
+    if (!listEl) return;
+
+    if (items.length === 0) {
+        listEl.innerHTML = '<div class="todo-empty">No tasks yet. Add one above.</div>';
+        footerEl.textContent = '';
+        return;
+    }
+
+    listEl.innerHTML = items.map((item, i) => `
+        <li class="todo-item${item.done ? ' done' : ''}"
+            tabindex="0"
+            data-index="${i}"
+            onkeydown="todoKeydown(event, ${i})"
+            ondblclick="todoStartEdit(${i})"
+            onclick="todoToggle(${i})">
+            <span class="todo-check">${item.done ? '✓' : ''}</span>
+            <span class="todo-text">${escapeHtml(item.text).replace(/\n/g, '<br>')}</span>
+            <button class="todo-delete" title="Delete" onclick="event.stopPropagation(); todoDelete(${i})">×</button>
+        </li>
+    `).join('');
+
+    const done  = items.filter(t => t.done).length;
+    const total = items.length;
+    footerEl.textContent = `${done} of ${total} done`;
+}
+
+function todoAdd() {
+    const input = document.getElementById('todo-input');
+    const text  = input.value.trim();
+    if (!text) return;
+    const items = todoLoad();
+    items.push({ text, done: false });
+    todoSave(items);
+    input.value = '';
+    input.style.height = '';
+    todoRender();
+}
+
+function todoToggle(index) {
+    // Don't toggle while editing
+    if (document.querySelector('.todo-item-edit')) return;
+    const items = todoLoad();
+    if (!items[index]) return;
+    items[index].done = !items[index].done;
+    todoSave(items);
+    todoRender();
+    const el = document.querySelector(`.todo-item[data-index="${index}"]`);
+    if (el) el.focus();
+}
+
+function todoDelete(index) {
+    const items = todoLoad();
+    items.splice(index, 1);
+    todoSave(items);
+    todoRender();
+    const next = document.querySelector(`.todo-item[data-index="${index}"]`)
+               || document.querySelector(`.todo-item[data-index="${index - 1}"]`);
+    if (next) next.focus();
+    else document.getElementById('todo-input').focus();
+}
+
+function todoStartEdit(index) {
+    const items = todoLoad();
+    if (!items[index]) return;
+
+    const li = document.querySelector(`.todo-item[data-index="${index}"]`);
+    if (!li) return;
+
+    // Replace item content with an inline textarea
+    const textarea = document.createElement('textarea');
+    textarea.className = 'todo-item-edit';
+    textarea.value = items[index].text;
+    textarea.rows  = Math.max(1, items[index].text.split('\n').length);
+
+    li.innerHTML = '';
+    li.appendChild(textarea);
+    li.onclick = null;
+    textarea.focus();
+    textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+
+    const commit = () => {
+        const newText = textarea.value.trim();
+        if (newText) items[index].text = newText;
+        todoSave(items);
+        todoRender();
+        const el = document.querySelector(`.todo-item[data-index="${index}"]`);
+        if (el) el.focus();
+    };
+
+    textarea.addEventListener('blur', commit);
+    textarea.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); commit(); }
+        if (e.key === 'Escape') { todoRender(); }
+    });
+}
+
+function todoKeydown(e, index) {
+    // Don't intercept keys while an edit textarea is active
+    if (e.target.tagName === 'TEXTAREA') return;
+    if (e.key === ' ')                                  { e.preventDefault(); todoToggle(index); }
+    if (e.key === 'Enter')                              { e.preventDefault(); todoToggle(index); }
+    if (e.key === 'Delete' || e.key === 'Backspace')    { e.preventDefault(); todoDelete(index); }
+    if (e.key === 'ArrowDown')                          { e.preventDefault(); focusTodoItem(index + 1); }
+    if (e.key === 'ArrowUp')                            { e.preventDefault(); focusTodoItem(index - 1); }
+    if (e.key === 'F2')                                 { e.preventDefault(); todoStartEdit(index); }
+}
+
+function focusTodoItem(index) {
+    const el = document.querySelector(`.todo-item[data-index="${index}"]`);
+    if (el) el.focus();
+}
+
+// Wire up input and render on panel activation
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('todo-input');
+    if (input) {
+        input.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); todoAdd(); }
+        });
+        // Auto-grow textarea
+        input.addEventListener('input', () => {
+            input.style.height = 'auto';
+            input.style.height = input.scrollHeight + 'px';
+        });
+    }
+
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        if (btn.getAttribute('data-tool') === 'todo-list') btn.addEventListener('click', todoRender);
+    });
+
+    todoRender();
+});
