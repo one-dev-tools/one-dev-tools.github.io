@@ -385,6 +385,16 @@ body {
     gap: 10px;
     padding: 9px 12px;
     border: 1px solid var(--rule);
+    border-bottom: none;
+}
+
+.todo-item:last-child {
+    border-bottom: 1px solid var(--rule);
+}
+
+.todo-item:nth-child(even) {
+    background: var(--surface-alt);
+}
     border-radius: 3px;
     background: var(--surface);
     cursor: pointer;
@@ -400,7 +410,7 @@ body {
 }
 
 .todo-item:hover {
-    background: var(--surface-alt);
+    background: var(--rule);
 }
 
 .todo-item.done {
