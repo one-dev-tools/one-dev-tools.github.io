@@ -496,7 +496,7 @@ function formatXMLString(xmlDoc, indent) {
                 depth++;
             }
         } else {
-            formatted += part;
+            formatted += '\n' + indentStr.repeat(depth) + part.trim();
         }
     });
     
