@@ -45,7 +45,7 @@
 /* ── Dark mode ───────────────────────────────────────────── */
 
 @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
         --bg:           #18181A;
         --surface:      #222224;
         --surface-alt:  #2A2A2D;
@@ -104,6 +104,84 @@
     ::-webkit-scrollbar-thumb:hover { background: #484850; }
 }
 
+/* Manual dark override (toggle) */
+:root[data-theme="dark"] {
+    --bg:           #18181A;
+    --surface:      #222224;
+    --surface-alt:  #2A2A2D;
+    --rule:         #35353A;
+    --ink:          #E8E8E4;
+    --ink-mid:      #A0A09A;
+    --ink-faint:    #606060;
+    --g-encode:       #7AA896; --g-encode-dim:   #1E2E2B;
+    --g-format:       #A8906A; --g-format-dim:   #2A2318;
+    --g-generate:     #7A96B8; --g-generate-dim: #1A2230;
+    --g-utility:      #9A88A4; --g-utility-dim:  #252030;
+    --g-personal:     #A8885A; --g-personal-dim: #2A2018;
+    --accent:       #7AA896;   --accent-dim:     #1E2E2B;
+    --error:        #C86060;   --error-bg:       #2A1A1A;
+    --success:      #6A9A78;   --success-bg:     #182418;
+    --shadow-sm:    0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
+    --shadow-md:    0 4px 12px rgba(0,0,0,0.4);
+}
+
+:root[data-theme="dark"] .diff-line.added    { background: #1A2E1A; }
+:root[data-theme="dark"] .diff-line.removed  { background: #2E1A1A; }
+:root[data-theme="dark"] .diff-line.added   .diff-line-num { background: #1E3A1E; border-right-color: #2A4A2A; }
+:root[data-theme="dark"] .diff-line.removed .diff-line-num { background: #3A1E1E; border-right-color: #4A2A2A; }
+:root[data-theme="dark"] .json-tree-value.string { color: #8AAA84; }
+:root[data-theme="dark"] .json-tree-value.number { color: #8898C8; }
+:root[data-theme="dark"] mark.regex-hl { background: #4A3E00; outline-color: #6A5A00; }
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb { background: var(--rule); }
+:root[data-theme="dark"] ::-webkit-scrollbar-thumb:hover { background: #484850; }
+
+/* ── Theme toggle button ─────────────────────────────────── */
+
+.sidebar-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.theme-toggle {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--rule);
+    background: var(--surface-alt);
+    color: var(--ink-faint);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    box-shadow: none;
+    transform: none;
+}
+
+.theme-toggle:hover {
+    background: var(--rule);
+    color: var(--ink);
+    border-color: var(--ink-faint);
+    transform: none;
+    box-shadow: none;
+}
+
+.theme-toggle::before {
+    content: '○';
+}
+
+:root[data-theme="dark"]  .theme-toggle::before { content: '●'; }
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle::before { content: '●'; }
+}
+
 body {
     font-family: var(--font-ui);
     background: var(--bg);
@@ -127,11 +205,6 @@ body {
     flex-direction: column;
     overflow: hidden;
     flex-shrink: 0;
-}
-
-.sidebar-header {
-    padding: 24px 20px 20px;
-    border-bottom: 1px solid var(--rule);
 }
 
 .sidebar-wordmark {

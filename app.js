@@ -34,6 +34,24 @@ document.addEventListener('DOMContentLoaded', () => {
     convertColor();
 });
 
+// ── Theme toggle ──────────────────────────────────────────
+
+(function () {
+    const stored = localStorage.getItem('onedevtools_theme');
+    if (stored) document.documentElement.setAttribute('data-theme', stored);
+})();
+
+function toggleTheme() {
+    const root     = document.documentElement;
+    const current  = root.getAttribute('data-theme');
+    const sysDark  = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Determine effective current mode
+    const isDark   = current === 'dark' || (!current && sysDark);
+    const next     = isDark ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('onedevtools_theme', next);
+}
+
 // ── Shared utilities ──────────────────────────────────────
 
 function clearInput(...ids) {
