@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One Dev Tools — Test Suite</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'IBM Plex Mono', 'Courier New', monospace;
+            font-size: 13px;
+            background: #F7F7F5;
+            color: #1A1A18;
+            padding: 32px;
+            line-height: 1.6;
+        }
+
+        h1 { font-size: 15px; font-weight: 600; margin-bottom: 24px; letter-spacing: 0.04em; }
+
+        .summary {
+            display: inline-block;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 8px 18px;
+            border-radius: 3px;
+            margin-bottom: 24px;
+            letter-spacing: 0.02em;
+        }
+        .summary.pass { background: #EBF3EE; color: #3A6B4A; border: 1px solid #C5DFC0; }
+        .summary.fail { background: #F9EDED; color: #8B3030; border: 1px solid #E8C4C0; }
+
+        details { margin-bottom: 10px; border: 1px solid #E2E2DE; border-radius: 3px; background: #fff; }
+        summary {
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            letter-spacing: 0.04em;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        summary::-webkit-details-marker { display: none; }
+        summary::before { content: '▶'; font-size: 9px; color: #9A9A94; transition: transform 0.15s; }
+        details[open] summary::before { transform: rotate(90deg); }
+
+        .suite-pass { color: #3A6B4A; }
+        .suite-fail { color: #8B3030; }
+
+        ul { list-style: none; padding: 0 0 8px 0; border-top: 1px solid #E2E2DE; }
+        li {
+            padding: 5px 14px 5px 36px;
+            font-size: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            border-bottom: 1px solid #F0F0EC;
+        }
+        li:last-child { border-bottom: none; }
+        .test-pass { color: #5A5A56; }
+        .test-fail { color: #8B3030; font-weight: 500; }
+        .err {
+            font-size: 11px;
+            color: #8B3030;
+            background: #F9EDED;
+            border-left: 2px solid #8B3030;
+            padding: 3px 8px;
+            margin-top: 2px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+    </style>
+</head>
+<body>
+    <h1>ONE DEV TOOLS — TEST SUITE</h1>
+    <div id="results">Running…</div>
+
+    <!-- App dependencies (order matters) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="../app.js"></script>
+
+    <!-- Test harness -->
+    <script src="harness.js"></script>
+
+    <!-- Test suites -->
+    <script src="encode.test.js"></script>
+    <script src="formats.test.js"></script>
+    <script src="generate.test.js"></script>
+    <script src="utility.test.js"></script>
+
+    <!-- Render -->
+    <script>
+        // generate.test.js contains async tests (UUID v5); wait a tick for all promises to settle
+        setTimeout(renderResults, 100);
+    </script>
+</body>
+</html>
