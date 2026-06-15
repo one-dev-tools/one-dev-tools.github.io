@@ -5,42 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>One Dev Tools - Developer Utilities</title>
     <meta name="description" content="Developer tools including URL encoder/decoder, JSON formatter, YAML formatter, XML formatter, JWT decoder, Base64 encoder, hash generator, UUID generator, timestamp converter, and color converter.">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛠️</text></svg>">
-    
-    <!-- Stylesheet -->
+
+    <link rel="icon" type="image/png" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⌗</text></svg>">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>🛠️ One Dev Tools</h1>
-            <p class="subtitle">Essential developer utilities in your browser</p>
-        </header>
+
+    <!-- Sidebar navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-wordmark">
+                One Dev Tools
+                <span>local · private · fast</span>
+            </div>
+        </div>
 
         <nav class="tool-nav">
-            <button class="tool-btn active" data-tool="url-encoder">URL</button>
-            <button class="tool-btn" data-tool="json-tool">JSON</button>
-            <button class="tool-btn" data-tool="xml-formatter">XML</button>
-            <button class="tool-btn" data-tool="yaml-formatter">YAML</button>
-            <button class="tool-btn" data-tool="jwt-decoder">JWT</button>
-            <button class="tool-btn" data-tool="base64">Base64</button>
-            <button class="tool-btn" data-tool="hash-generator">Hash</button>
-            <button class="tool-btn" data-tool="uuid-generator">UUID</button>
-            <button class="tool-btn" data-tool="timestamp-converter">Timestamp</button>
-            <button class="tool-btn" data-tool="color-converter">Color</button>
+            <div class="nav-group-label">Encode / Decode</div>
+            <button class="tool-btn active" data-tool="base64" data-group="encode">
+                <span class="tool-label">Base64</span>
+                <span class="tool-hint">encode / decode</span>
+            </button>
+            <button class="tool-btn" data-tool="url-encoder" data-group="encode">
+                <span class="tool-label">URL</span>
+                <span class="tool-hint">encode / decode</span>
+            </button>
+            <button class="tool-btn" data-tool="jwt-decoder" data-group="encode">
+                <span class="tool-label">JWT</span>
+                <span class="tool-hint">decode · inspect</span>
+            </button>
+
+            <div class="nav-group-label">Data Formats</div>
+            <button class="tool-btn" data-tool="json-tool" data-group="format">
+                <span class="tool-label">JSON</span>
+                <span class="tool-hint">format · visualize</span>
+            </button>
+            <button class="tool-btn" data-tool="yaml-formatter" data-group="format">
+                <span class="tool-label">YAML</span>
+                <span class="tool-hint">format · validate</span>
+            </button>
+            <button class="tool-btn" data-tool="yaml-json-converter" data-group="format">
+                <span class="tool-label">YAML ↔ JSON</span>
+                <span class="tool-hint">convert between formats</span>
+            </button>
+            <button class="tool-btn" data-tool="xml-formatter" data-group="format">
+                <span class="tool-label">XML</span>
+                <span class="tool-hint">format · validate</span>
+            </button>
+            <button class="tool-btn" data-tool="sql-formatter" data-group="format">
+                <span class="tool-label">SQL</span>
+                <span class="tool-hint">format · prettify</span>
+            </button>
+            <button class="tool-btn" data-tool="json-csv-converter" data-group="format">
+                <span class="tool-label">JSON ↔ CSV</span>
+                <span class="tool-hint">convert between formats</span>
+            </button>
+
+            <div class="nav-group-label">Generate</div>
+            <button class="tool-btn" data-tool="uuid-generator" data-group="generate">
+                <span class="tool-label">UUID</span>
+                <span class="tool-hint">v1 · v3 · v4 · v5</span>
+            </button>
+            <button class="tool-btn" data-tool="hash-generator" data-group="generate">
+                <span class="tool-label">Hash</span>
+                <span class="tool-hint">MD5 · SHA-1/256/512</span>
+            </button>
+            <button class="tool-btn" data-tool="timestamp-converter" data-group="generate">
+                <span class="tool-label">Timestamp</span>
+                <span class="tool-hint">unix · ISO · locale</span>
+            </button>
+
+            <div class="nav-group-label">Utility</div>
+            <button class="tool-btn" data-tool="color-converter" data-group="utility">
+                <span class="tool-label">Color</span>
+                <span class="tool-hint">HEX · RGB · HSL</span>
+            </button>
+            <button class="tool-btn" data-tool="text-compare" data-group="utility">
+                <span class="tool-label">Text Compare</span>
+                <span class="tool-hint">diff two texts</span>
+            </button>
+            <button class="tool-btn" data-tool="string-case" data-group="utility">
+                <span class="tool-label">String Case</span>
+                <span class="tool-hint">camel · snake · kebab…</span>
+            </button>
         </nav>
 
-        <main class="tool-container">
+        <div class="sidebar-footer">
+            All processing is local.<br>
+            Your data never leaves this tab.<br><br>
+            <a href="https://github.com/one-dev-tools/one-dev-tools.github.io" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+            &nbsp;·&nbsp; © 2026
+        </div>
+    </aside>
+
+    <!-- Main content area -->
+    <div class="main-area">
+        <div class="main-inner">
+
             <!-- URL Encoder/Decoder -->
-            <div class="tool-panel active" id="url-encoder">
-                <h2>URL Encoder/Decoder</h2>
+            <div class="tool-panel" id="url-encoder">
+                <h2>URL Encoder / Decoder</h2>
                 <div class="button-group">
                     <button onclick="encodeURL()">Encode</button>
                     <button onclick="decodeURL()">Decode</button>
                     <button onclick="clearInput('url-input', 'url-output')">Clear</button>
-                    <button class="copy-btn" onclick="copyToClipboard('url-output')">Copy Result</button>
+                    <button class="copy-btn" onclick="copyToClipboard('url-output')">Copy result</button>
                 </div>
                 <div class="tool-content">
                     <div class="tool-split-view">
@@ -56,26 +130,24 @@
                 </div>
             </div>
 
-            <!-- JSON Tool (Formatter + Visualizer) -->
+            <!-- JSON Tool -->
             <div class="tool-panel" id="json-tool">
-                <h2>JSON Formatter & Visualizer</h2>
-                
-                <!-- Sub-tabs for Format and Visualize -->
+                <h2>JSON Formatter &amp; Visualizer</h2>
+
                 <div class="sub-tabs">
                     <button class="sub-tab-btn active" data-subtab="format">Format</button>
                     <button class="sub-tab-btn" data-subtab="visualize">Visualize</button>
                 </div>
 
-                <!-- Format Tab Content -->
                 <div class="sub-tab-content active" id="format-tab">
                     <div class="button-group">
-                        <button onclick="formatJSON()">Format (Pretty)</button>
+                        <button onclick="formatJSON()">Format</button>
                         <button onclick="minifyJSON()">Minify</button>
                         <button onclick="validateJSON()">Validate</button>
                         <button onclick="clearInput('json-input', 'json-output')">Clear</button>
-                        <button class="copy-btn" onclick="copyToClipboard('json-output')">Copy Result</button>
+                        <button class="copy-btn" onclick="copyToClipboard('json-output')">Copy result</button>
                         <div class="indent-control">
-                            <label>Indent Size:</label>
+                            <label>Indent</label>
                             <input type="number" id="json-indent" value="2" min="1" max="8">
                         </div>
                     </div>
@@ -84,7 +156,7 @@
                         <div class="tool-split-view">
                             <div class="tool-input-panel">
                                 <h3>Input</h3>
-                                <textarea id="json-input" placeholder='Enter JSON here... e.g., {"name":"John","age":30}'></textarea>
+                                <textarea id="json-input" placeholder='{"name":"John","age":30}'></textarea>
                             </div>
                             <div class="tool-output-panel">
                                 <h3>Output</h3>
@@ -94,13 +166,12 @@
                     </div>
                 </div>
 
-                <!-- Visualize Tab Content -->
                 <div class="sub-tab-content" id="visualize-tab">
                     <div class="button-group">
                         <button onclick="visualizeJSON()">Visualize</button>
-                        <button onclick="expandAllJSON()">Expand All</button>
-                        <button onclick="collapseAllJSON()">Collapse All</button>
-                        <button onclick="copyVisualizedJSON()">Copy as JSON</button>
+                        <button onclick="expandAllJSON()">Expand all</button>
+                        <button onclick="collapseAllJSON()">Collapse all</button>
+                        <button class="copy-btn" onclick="copyVisualizedJSON()">Copy as JSON</button>
                         <button onclick="clearInput('json-viz-input', 'json-viz-output')">Clear</button>
                     </div>
                     <div id="json-viz-validation" class="validation-message"></div>
@@ -108,10 +179,10 @@
                         <div class="tool-split-view">
                             <div class="tool-input-panel">
                                 <h3>Input</h3>
-                                <textarea id="json-viz-input" placeholder='Enter JSON to visualize... e.g., {"users":[{"name":"John","age":30}]}'></textarea>
+                                <textarea id="json-viz-input" placeholder='{"users":[{"name":"John","age":30}]}'></textarea>
                             </div>
                             <div class="tool-output-panel">
-                                <h3>Interactive Tree View</h3>
+                                <h3>Interactive tree</h3>
                                 <div id="json-viz-output" class="json-tree"></div>
                             </div>
                         </div>
@@ -123,13 +194,13 @@
             <div class="tool-panel" id="xml-formatter">
                 <h2>XML Formatter</h2>
                 <div class="button-group">
-                    <button onclick="formatXML()">Format (Pretty)</button>
+                    <button onclick="formatXML()">Format</button>
                     <button onclick="minifyXML()">Minify</button>
                     <button onclick="validateXML()">Validate</button>
                     <button onclick="clearInput('xml-input', 'xml-output')">Clear</button>
-                    <button class="copy-btn" onclick="copyToClipboard('xml-output')">Copy Result</button>
+                    <button class="copy-btn" onclick="copyToClipboard('xml-output')">Copy result</button>
                     <div class="indent-control">
-                        <label>Indent Size:</label>
+                        <label>Indent</label>
                         <input type="number" id="xml-indent" value="2" min="1" max="8">
                     </div>
                 </div>
@@ -138,7 +209,7 @@
                     <div class="tool-split-view">
                         <div class="tool-input-panel">
                             <h3>Input</h3>
-                            <textarea id="xml-input" placeholder="Enter XML here... e.g., <root><item>value</item></root>"></textarea>
+                            <textarea id="xml-input" placeholder="<root><item>value</item></root>"></textarea>
                         </div>
                         <div class="tool-output-panel">
                             <h3>Output</h3>
@@ -152,12 +223,12 @@
             <div class="tool-panel" id="yaml-formatter">
                 <h2>YAML Formatter</h2>
                 <div class="button-group">
-                    <button onclick="formatYAML()">Format (Pretty)</button>
+                    <button onclick="formatYAML()">Format</button>
                     <button onclick="validateYAML()">Validate</button>
                     <button onclick="clearInput('yaml-input', 'yaml-output')">Clear</button>
-                    <button class="copy-btn" onclick="copyToClipboard('yaml-output')">Copy Result</button>
+                    <button class="copy-btn" onclick="copyToClipboard('yaml-output')">Copy result</button>
                     <div class="indent-control">
-                        <label>Indent Size:</label>
+                        <label>Indent</label>
                         <input type="number" id="yaml-indent" value="2" min="1" max="8">
                     </div>
                 </div>
@@ -166,7 +237,7 @@
                     <div class="tool-split-view">
                         <div class="tool-input-panel">
                             <h3>Input</h3>
-                            <textarea id="yaml-input" placeholder="Enter YAML here... e.g., name: John\nage: 30"></textarea>
+                            <textarea id="yaml-input" placeholder="name: John&#10;age: 30"></textarea>
                         </div>
                         <div class="tool-output-panel">
                             <h3>Output</h3>
@@ -183,11 +254,11 @@
                 <div class="tool-content">
                     <div class="tool-split-view">
                         <div class="tool-input-panel">
-                            <h3>JWT Token</h3>
+                            <h3>Token</h3>
                             <textarea id="jwt-input" placeholder="Paste your JWT token here..." oninput="decodeJWT()"></textarea>
                         </div>
                         <div class="tool-output-panel">
-                            <h3>Decoded JWT</h3>
+                            <h3>Decoded</h3>
                             <div id="jwt-output" class="jwt-output">
                                 <div class="jwt-section">
                                     <h4>Header</h4>
@@ -208,13 +279,13 @@
             </div>
 
             <!-- Base64 Encoder/Decoder -->
-            <div class="tool-panel" id="base64">
-                <h2>Base64 Encoder/Decoder</h2>
+            <div class="tool-panel active" id="base64">
+                <h2>Base64 Encoder / Decoder</h2>
                 <div class="button-group">
                     <button onclick="encodeBase64()">Encode</button>
                     <button onclick="decodeBase64()">Decode</button>
                     <button onclick="clearInput('base64-input', 'base64-output')">Clear</button>
-                    <button class="copy-btn" onclick="copyToClipboard('base64-output')">Copy Result</button>
+                    <button class="copy-btn" onclick="copyToClipboard('base64-output')">Copy result</button>
                 </div>
                 <div class="tool-content">
                     <div class="tool-split-view">
@@ -236,27 +307,27 @@
                 <div class="tool-content">
                     <textarea id="hash-input" placeholder="Enter text to hash..."></textarea>
                     <div class="button-group">
-                        <button onclick="generateHashes()">Generate Hashes</button>
+                        <button onclick="generateHashes()">Generate hashes</button>
                         <button onclick="clearInput('hash-input', 'hash-output')">Clear</button>
                     </div>
                     <div id="hash-output" class="hash-output">
                         <div class="hash-result">
-                            <label>MD5:</label>
+                            <label>MD5</label>
                             <input type="text" id="hash-md5" readonly>
                             <button onclick="copyToClipboardFromInput('hash-md5')">Copy</button>
                         </div>
                         <div class="hash-result">
-                            <label>SHA-1:</label>
+                            <label>SHA-1</label>
                             <input type="text" id="hash-sha1" readonly>
                             <button onclick="copyToClipboardFromInput('hash-sha1')">Copy</button>
                         </div>
                         <div class="hash-result">
-                            <label>SHA-256:</label>
+                            <label>SHA-256</label>
                             <input type="text" id="hash-sha256" readonly>
                             <button onclick="copyToClipboardFromInput('hash-sha256')">Copy</button>
                         </div>
                         <div class="hash-result">
-                            <label>SHA-512:</label>
+                            <label>SHA-512</label>
                             <input type="text" id="hash-sha512" readonly>
                             <button onclick="copyToClipboardFromInput('hash-sha512')">Copy</button>
                         </div>
@@ -270,16 +341,16 @@
                 <div class="tool-content">
                     <div class="uuid-config">
                         <div class="uuid-type-selector">
-                            <label for="uuid-version">UUID Version:</label>
+                            <label for="uuid-version">Version</label>
                             <select id="uuid-version" onchange="toggleNamespaceInput()">
-                                <option value="v1">v1 - Time-based</option>
-                                <option value="v4" selected>v4 - Random</option>
-                                <option value="v3">v3 - Name-based (MD5)</option>
-                                <option value="v5">v5 - Name-based (SHA-1)</option>
+                                <option value="v1">v1 — Time-based</option>
+                                <option value="v4" selected>v4 — Random</option>
+                                <option value="v3">v3 — Name-based (MD5)</option>
+                                <option value="v5">v5 — Name-based (SHA-1)</option>
                             </select>
                         </div>
                         <div id="namespace-input" class="namespace-input" style="display: none;">
-                            <label for="uuid-namespace">Namespace:</label>
+                            <label for="uuid-namespace">Namespace</label>
                             <select id="uuid-namespace">
                                 <option value="dns">DNS (6ba7b810-9dad-11d1-80b4-00c04fd430c8)</option>
                                 <option value="url">URL (6ba7b811-9dad-11d1-80b4-00c04fd430c8)</option>
@@ -293,18 +364,18 @@
                     </div>
                     <div class="button-group">
                         <button onclick="generateUUIDByVersion()">Generate UUID</button>
-                        <button onclick="generateMultipleUUIDs()">Generate 10 UUIDs</button>
+                        <button onclick="generateMultipleUUIDs()">Generate 10</button>
                         <button onclick="clearInput('uuid-output', 'uuid-compact-output')">Clear</button>
                     </div>
                     <div class="uuid-outputs">
                         <div class="uuid-format-section">
-                            <h3>Standard UUID (with hyphens)</h3>
-                            <textarea id="uuid-output" placeholder="Enter UUID or generate one..." oninput="convertToCompact()"></textarea>
+                            <h3>Standard (with hyphens)</h3>
+                            <textarea id="uuid-output" placeholder="UUID will appear here..." oninput="convertToCompact()"></textarea>
                             <button class="copy-btn" onclick="copyToClipboard('uuid-output')">Copy</button>
                         </div>
                         <div class="uuid-format-section">
-                            <h3>Compact Format (32 chars, uppercase)</h3>
-                            <textarea id="uuid-compact-output" placeholder="Enter compact UUID or generate one..." oninput="convertToStandard()"></textarea>
+                            <h3>Compact (32 chars, uppercase)</h3>
+                            <textarea id="uuid-compact-output" placeholder="Compact UUID will appear here..." oninput="convertToStandard()"></textarea>
                             <button class="copy-btn" onclick="copyToClipboard('uuid-compact-output')">Copy</button>
                         </div>
                     </div>
@@ -316,40 +387,40 @@
                 <h2>Timestamp Converter</h2>
                 <div class="tool-content">
                     <div class="timestamp-section">
-                        <h3>Current Timestamp</h3>
+                        <h3>Current time</h3>
                         <div class="current-time">
                             <div class="time-display">
-                                <label>Unix (seconds):</label>
+                                <label>Unix (seconds)</label>
                                 <input type="text" id="current-unix" readonly>
                                 <button onclick="copyToClipboardFromInput('current-unix')">Copy</button>
                             </div>
                             <div class="time-display">
-                                <label>Unix (milliseconds):</label>
+                                <label>Unix (milliseconds)</label>
                                 <input type="text" id="current-unix-ms" readonly>
                                 <button onclick="copyToClipboardFromInput('current-unix-ms')">Copy</button>
                             </div>
                             <div class="time-display">
-                                <label>ISO 8601:</label>
+                                <label>ISO 8601</label>
                                 <input type="text" id="current-iso" readonly>
                                 <button onclick="copyToClipboardFromInput('current-iso')">Copy</button>
                             </div>
                             <div class="time-display">
-                                <label>Browser Locale:</label>
+                                <label>Browser locale</label>
                                 <input type="text" id="current-locale" readonly>
                                 <button onclick="copyToClipboardFromInput('current-locale')">Copy</button>
                             </div>
                         </div>
                     </div>
                     <div class="timestamp-section">
-                        <h3>Convert Timestamp</h3>
+                        <h3>Convert a timestamp</h3>
                         <input type="text" id="timestamp-input" placeholder="Enter Unix timestamp (seconds or milliseconds)">
                         <button onclick="convertTimestamp()">Convert</button>
                         <div id="timestamp-output" class="timestamp-result"></div>
                     </div>
                     <div class="timestamp-section">
-                        <h3>Convert Date to Timestamp</h3>
+                        <h3>Date to timestamp</h3>
                         <input type="datetime-local" id="date-input">
-                        <button onclick="convertDateToTimestamp()">Convert to Timestamp</button>
+                        <button onclick="convertDateToTimestamp()">Convert to timestamp</button>
                         <div id="date-output" class="timestamp-result"></div>
                     </div>
                 </div>
@@ -360,41 +431,250 @@
                 <h2>Color Converter</h2>
                 <div class="tool-content">
                     <div class="color-picker-section">
-                        <label>Pick a Color:</label>
+                        <label>Pick a color</label>
                         <input type="color" id="color-picker" value="#3498db" onchange="convertColor()">
                         <div id="color-preview" style="background-color: #3498db;"></div>
                     </div>
                     <div class="color-input-section">
-                        <label>Or enter a color (HEX, RGB, HSL):</label>
-                        <input type="text" id="color-input" placeholder="e.g., #3498db, rgb(52,152,219), hsl(204,70%,53%)">
+                        <label>Or enter a value (HEX, RGB, HSL)</label>
+                        <input type="text" id="color-input" placeholder="e.g., #3498db  ·  rgb(52,152,219)  ·  hsl(204,70%,53%)">
                         <button onclick="parseColorInput()">Convert</button>
                     </div>
                     <div id="color-output" class="color-output">
                         <div class="color-result">
-                            <label>HEX:</label>
+                            <label>HEX</label>
                             <input type="text" id="color-hex" readonly>
                             <button onclick="copyToClipboardFromInput('color-hex')">Copy</button>
                         </div>
                         <div class="color-result">
-                            <label>RGB:</label>
+                            <label>RGB</label>
                             <input type="text" id="color-rgb" readonly>
                             <button onclick="copyToClipboardFromInput('color-rgb')">Copy</button>
                         </div>
                         <div class="color-result">
-                            <label>HSL:</label>
+                            <label>HSL</label>
                             <input type="text" id="color-hsl" readonly>
                             <button onclick="copyToClipboardFromInput('color-hsl')">Copy</button>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
 
-        <footer>
-            <p>One Dev Tools - All processing happens locally in your browser. Your data never leaves your device.</p>
-            <p>© 2026 | <a href="https://github.com/one-dev-tools/one-dev-tools.github.io" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>
-        </footer>
-    </div>
+            <!-- YAML ↔ JSON Converter -->
+            <div class="tool-panel" id="yaml-json-converter">
+                <h2>YAML ↔ JSON Converter</h2>
+
+                <div class="sub-tabs">
+                    <button class="sub-tab-btn active" data-subtab="yaml-to-json">YAML → JSON</button>
+                    <button class="sub-tab-btn" data-subtab="json-to-yaml">JSON → YAML</button>
+                </div>
+
+                <div class="sub-tab-content active" id="yaml-to-json-tab">
+                    <div class="button-group">
+                        <button onclick="convertYAMLtoJSON()">Convert</button>
+                        <button onclick="clearInput('yaml-to-json-input', 'yaml-to-json-output')">Clear</button>
+                        <button class="copy-btn" onclick="copyToClipboard('yaml-to-json-output')">Copy result</button>
+                        <div class="indent-control">
+                            <label>Indent</label>
+                            <input type="number" id="yaml-to-json-indent" value="2" min="1" max="8">
+                        </div>
+                    </div>
+                    <div id="yaml-to-json-validation" class="validation-message"></div>
+                    <div class="tool-content">
+                        <div class="tool-split-view">
+                            <div class="tool-input-panel">
+                                <h3>YAML input</h3>
+                                <textarea id="yaml-to-json-input" placeholder="name: John&#10;age: 30&#10;tags:&#10;  - dev&#10;  - admin"></textarea>
+                            </div>
+                            <div class="tool-output-panel">
+                                <h3>JSON output</h3>
+                                <textarea id="yaml-to-json-output" readonly placeholder="JSON will appear here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-tab-content" id="json-to-yaml-tab">
+                    <div class="button-group">
+                        <button onclick="convertJSONtoYAML()">Convert</button>
+                        <button onclick="clearInput('json-to-yaml-input', 'json-to-yaml-output')">Clear</button>
+                        <button class="copy-btn" onclick="copyToClipboard('json-to-yaml-output')">Copy result</button>
+                        <div class="indent-control">
+                            <label>Indent</label>
+                            <input type="number" id="json-to-yaml-indent" value="2" min="1" max="8">
+                        </div>
+                    </div>
+                    <div id="json-to-yaml-validation" class="validation-message"></div>
+                    <div class="tool-content">
+                        <div class="tool-split-view">
+                            <div class="tool-input-panel">
+                                <h3>JSON input</h3>
+                                <textarea id="json-to-yaml-input" placeholder='{"name":"John","age":30,"tags":["dev","admin"]}'></textarea>
+                            </div>
+                            <div class="tool-output-panel">
+                                <h3>YAML output</h3>
+                                <textarea id="json-to-yaml-output" readonly placeholder="YAML will appear here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- JSON ↔ CSV Converter -->
+            <div class="tool-panel" id="json-csv-converter">
+                <h2>JSON ↔ CSV Converter</h2>
+
+                <div class="sub-tabs">
+                    <button class="sub-tab-btn active" data-subtab="json-to-csv">JSON → CSV</button>
+                    <button class="sub-tab-btn" data-subtab="csv-to-json">CSV → JSON</button>
+                </div>
+
+                <div class="sub-tab-content active" id="json-to-csv-tab">
+                    <div class="button-group">
+                        <button onclick="convertJSONtoCSV()">Convert</button>
+                        <button onclick="clearInput('json-to-csv-input', 'json-to-csv-output')">Clear</button>
+                        <button class="copy-btn" onclick="copyToClipboard('json-to-csv-output')">Copy result</button>
+                    </div>
+                    <div id="json-to-csv-validation" class="validation-message"></div>
+                    <div class="tool-content">
+                        <div class="tool-split-view">
+                            <div class="tool-input-panel">
+                                <h3>JSON input</h3>
+                                <textarea id="json-to-csv-input" placeholder='[{"name":"Alice","age":30},{"name":"Bob","age":25}]'></textarea>
+                            </div>
+                            <div class="tool-output-panel">
+                                <h3>CSV output</h3>
+                                <textarea id="json-to-csv-output" readonly placeholder="CSV will appear here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-tab-content" id="csv-to-json-tab">
+                    <div class="button-group">
+                        <button onclick="convertCSVtoJSON()">Convert</button>
+                        <button onclick="clearInput('csv-to-json-input', 'csv-to-json-output')">Clear</button>
+                        <button class="copy-btn" onclick="copyToClipboard('csv-to-json-output')">Copy result</button>
+                    </div>
+                    <div id="csv-to-json-validation" class="validation-message"></div>
+                    <div class="tool-content">
+                        <div class="tool-split-view">
+                            <div class="tool-input-panel">
+                                <h3>CSV input</h3>
+                                <textarea id="csv-to-json-input" placeholder="name,age&#10;Alice,30&#10;Bob,25"></textarea>
+                            </div>
+                            <div class="tool-output-panel">
+                                <h3>JSON output</h3>
+                                <textarea id="csv-to-json-output" readonly placeholder="JSON will appear here..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Text Compare -->
+            <div class="tool-panel" id="text-compare">
+                <h2>Text Compare</h2>
+                <div class="button-group">
+                    <button onclick="compareTexts()">Compare</button>
+                    <button onclick="clearCompare()">Clear</button>
+                </div>
+                <div class="tool-content">
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>Text A</h3>
+                            <textarea id="compare-input-a" placeholder="Paste first text here..."></textarea>
+                        </div>
+                        <div class="tool-input-panel">
+                            <h3>Text B</h3>
+                            <textarea id="compare-input-b" placeholder="Paste second text here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="diff-summary" id="diff-summary"></div>
+                    <div class="diff-output" id="diff-output"></div>
+                </div>
+            </div>
+
+            <!-- String Case Converter -->
+            <div class="tool-panel" id="string-case">
+                <h2>String Case Converter</h2>
+                <div class="tool-content">
+                    <div class="tool-input-panel">
+                        <h3>Input</h3>
+                        <textarea id="string-case-input" placeholder="Enter text in any format — spaces, hyphens, underscores, or camelCase all work..." oninput="convertAllCases()"></textarea>
+                    </div>
+                    <div class="case-results" id="case-results">
+                        <div class="case-result">
+                            <label>camelCase</label>
+                            <input type="text" id="case-camel" readonly>
+                            <button onclick="copyToClipboardFromInput('case-camel')">Copy</button>
+                        </div>
+                        <div class="case-result">
+                            <label>PascalCase</label>
+                            <input type="text" id="case-pascal" readonly>
+                            <button onclick="copyToClipboardFromInput('case-pascal')">Copy</button>
+                        </div>
+                        <div class="case-result">
+                            <label>snake_case</label>
+                            <input type="text" id="case-snake" readonly>
+                            <button onclick="copyToClipboardFromInput('case-snake')">Copy</button>
+                        </div>
+                        <div class="case-result">
+                            <label>kebab-case</label>
+                            <input type="text" id="case-kebab" readonly>
+                            <button onclick="copyToClipboardFromInput('case-kebab')">Copy</button>
+                        </div>
+                        <div class="case-result">
+                            <label>CONSTANT_CASE</label>
+                            <input type="text" id="case-constant" readonly>
+                            <button onclick="copyToClipboardFromInput('case-constant')">Copy</button>
+                        </div>
+                        <div class="case-result">
+                            <label>lowercase</label>
+                            <input type="text" id="case-lower" readonly>
+                            <button onclick="copyToClipboardFromInput('case-lower')">Copy</button>
+                        </div>
+                        <div class="case-result">
+                            <label>UPPERCASE</label>
+                            <input type="text" id="case-upper" readonly>
+                            <button onclick="copyToClipboardFromInput('case-upper')">Copy</button>
+                        </div>
+                        <div class="case-result">
+                            <label>Title Case</label>
+                            <input type="text" id="case-title" readonly>
+                            <button onclick="copyToClipboardFromInput('case-title')">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SQL Formatter -->
+            <div class="tool-panel" id="sql-formatter">
+                <h2>SQL Formatter</h2>
+                <div class="button-group">
+                    <button onclick="formatSQL()">Format</button>
+                    <button onclick="minifySQL()">Minify</button>
+                    <button onclick="validateSQL(true)">Validate</button>
+                    <button onclick="clearInput('sql-input', 'sql-output')">Clear</button>
+                    <button class="copy-btn" onclick="copyToClipboard('sql-output')">Copy result</button>
+                </div>
+                <div id="sql-validation" class="validation-message"></div>
+                <div class="tool-content">
+                    <div class="tool-split-view">
+                        <div class="tool-input-panel">
+                            <h3>Input</h3>
+                            <textarea id="sql-input" placeholder="SELECT u.id, u.name, o.total FROM users u JOIN orders o ON u.id = o.user_id WHERE o.total > 100 ORDER BY o.total DESC;"></textarea>
+                        </div>
+                        <div class="tool-output-panel">
+                            <h3>Output</h3>
+                            <textarea id="sql-output" readonly placeholder="Formatted SQL will appear here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.main-inner -->
+    </div><!-- /.main-area -->
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
     <script src="app.js"></script>

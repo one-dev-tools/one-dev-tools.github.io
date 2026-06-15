@@ -1266,3 +1266,592 @@ function hslToHex(h, s, l) {
         Math.round((b + m) * 255)
     );
 }
+
+// YAML ↔ JSON Converters
+function convertYAMLtoJSON() {
+    const input = document.getElementById('yaml-to-json-input').value;
+    const indent = parseInt(document.getElementById('yaml-to-json-indent').value) || 2;
+    const validation = document.getElementById('yaml-to-json-validation');
+
+    try {
+        const parsed = jsyaml.load(input);
+        const json = JSON.stringify(parsed, null, indent);
+        document.getElementById('yaml-to-json-output').value = json;
+        validation.textContent = '✓ Converted successfully';
+        validation.className = 'validation-message success';
+    } catch (error) {
+        validation.textContent = '✗ Invalid YAML: ' + error.message;
+        validation.className = 'validation-message error';
+        document.getElementById('yaml-to-json-output').value = '';
+    }
+}
+
+function convertJSONtoYAML() {
+    const input = document.getElementById('json-to-yaml-input').value;
+    const indent = parseInt(document.getElementById('json-to-yaml-indent').value) || 2;
+    const validation = document.getElementById('json-to-yaml-validation');
+
+    try {
+        const parsed = JSON.parse(input);
+        const yaml = jsyaml.dump(parsed, { indent });
+        document.getElementById('json-to-yaml-output').value = yaml;
+        validation.textContent = '✓ Converted successfully';
+        validation.className = 'validation-message success';
+    } catch (error) {
+        validation.textContent = '✗ Invalid JSON: ' + error.message;
+        validation.className = 'validation-message error';
+        document.getElementById('json-to-yaml-output').value = '';
+    }
+}
+
+// JSON ↔ CSV Converter
+function convertJSONtoCSV() {
+    const input = document.getElementById('json-to-csv-input').value.trim();
+    const validation = document.getElementById('json-to-csv-validation');
+
+    try {
+        const parsed = JSON.parse(input);
+        const rows = Array.isArray(parsed) ? parsed : [parsed];
+
+        if (rows.length === 0 || typeof rows[0] !== 'object' || rows[0] === null) {
+            throw new Error('Input must be a JSON array of objects');
+        }
+
+        const headers = Array.from(
+            rows.reduce((set, row) => { Object.keys(row).forEach(k => set.add(k)); return set; }, new Set())
+        );
+
+        const escape = val => {
+            const str = val === null || val === undefined ? '' : String(val);
+            return str.includes(',') || str.includes('"') || str.includes('\n')
+                ? `"${str.replace(/"/g, '""')}"` : str;
+        };
+
+        const csv = [
+            headers.map(escape).join(','),
+            ...rows.map(row => headers.map(h => escape(row[h])).join(','))
+        ].join('\n');
+
+        document.getElementById('json-to-csv-output').value = csv;
+        validation.textContent = `✓ Converted — ${rows.length} row${rows.length !== 1 ? 's' : ''}, ${headers.length} column${headers.length !== 1 ? 's' : ''}`;
+        validation.className = 'validation-message success';
+    } catch (error) {
+        validation.textContent = '✗ ' + error.message;
+        validation.className = 'validation-message error';
+        document.getElementById('json-to-csv-output').value = '';
+    }
+}
+
+function convertCSVtoJSON() {
+    const input = document.getElementById('csv-to-json-input').value.trim();
+    const validation = document.getElementById('csv-to-json-validation');
+
+    try {
+        if (!input) throw new Error('Input is empty');
+
+        const parseCSVLine = line => {
+            const result = [];
+            let cur = '', inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    if (inQuotes && line[i + 1] === '"') { cur += '"'; i++; }
+                    else { inQuotes = !inQuotes; }
+                } else if (ch === ',' && !inQuotes) {
+                    result.push(cur); cur = '';
+                } else {
+                    cur += ch;
+                }
+            }
+            result.push(cur);
+            return result;
+        };
+
+        const lines = input.split('\n').filter(l => l.trim() !== '');
+        if (lines.length < 2) throw new Error('CSV must have a header row and at least one data row');
+
+        const headers = parseCSVLine(lines[0]);
+        const rows = lines.slice(1).map(line => {
+            const values = parseCSVLine(line);
+            return Object.fromEntries(headers.map((h, i) => {
+                const v = values[i] ?? '';
+                const num = Number(v);
+                return [h.trim(), v === '' ? '' : (!isNaN(num) && v.trim() !== '' ? num : v)];
+            }));
+        });
+
+        document.getElementById('csv-to-json-output').value = JSON.stringify(rows, null, 2);
+        validation.textContent = `✓ Converted — ${rows.length} row${rows.length !== 1 ? 's' : ''}, ${headers.length} column${headers.length !== 1 ? 's' : ''}`;
+        validation.className = 'validation-message success';
+    } catch (error) {
+        validation.textContent = '✗ ' + error.message;
+        validation.className = 'validation-message error';
+        document.getElementById('csv-to-json-output').value = '';
+    }
+}
+
+// Text Compare
+function compareTexts() {
+    const a = document.getElementById('compare-input-a').value;
+    const b = document.getElementById('compare-input-b').value;
+    const summaryEl = document.getElementById('diff-summary');
+    const outputEl  = document.getElementById('diff-output');
+
+    const linesA = a.split('\n');
+    const linesB = b.split('\n');
+
+    const diff = computeLineDiff(linesA, linesB);
+
+    let added = 0, removed = 0;
+    diff.forEach(d => { if (d.type === 'add') added++; else if (d.type === 'del') removed++; });
+
+    if (added === 0 && removed === 0) {
+        summaryEl.innerHTML = '';
+        let html = '';
+        linesA.forEach((line, i) => {
+            html += diffLineHTML('identical', i + 1, i + 1, line);
+        });
+        outputEl.innerHTML = html;
+        return;
+    }
+
+    summaryEl.innerHTML =
+        `<span class="diff-stat-add">+${added} addition${added !== 1 ? 's' : ''}</span>` +
+        `&ensp;<span class="diff-stat-del">−${removed} deletion${removed !== 1 ? 's' : ''}</span>`;
+
+    const CONTEXT = 3;
+    const changed = new Set();
+    diff.forEach((d, i) => { if (d.type !== 'eq') { for (let j = Math.max(0, i - CONTEXT); j <= Math.min(diff.length - 1, i + CONTEXT); j++) changed.add(j); } });
+
+    let html = '';
+    let lineA = 1, lineB = 1, skipping = false;
+
+    diff.forEach((d, i) => {
+        if (!changed.has(i)) {
+            if (!skipping) {
+                html += `<div class="diff-separator">⋯ unchanged</div>`;
+                skipping = true;
+            }
+            if (d.type === 'eq') { lineA++; lineB++; }
+            return;
+        }
+        skipping = false;
+
+        if (d.type === 'eq') {
+            html += diffLineHTML('equal', lineA, lineB, d.text);
+            lineA++; lineB++;
+        } else if (d.type === 'del') {
+            html += diffLineHTML('removed', lineA, '', d.text);
+            lineA++;
+        } else {
+            html += diffLineHTML('added', '', lineB, d.text);
+            lineB++;
+        }
+    });
+
+    outputEl.innerHTML = html;
+}
+
+function diffLineHTML(type, numA, numB, text) {
+    const num = type === 'added' ? numB : (type === 'removed' ? numA : numA);
+    const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return `<div class="diff-line ${type}"><span class="diff-line-num">${num}</span><span class="diff-line-content">${escaped}</span></div>`;
+}
+
+function computeLineDiff(a, b) {
+    // Standard patience-style LCS diff via DP
+    const m = a.length, n = b.length;
+    const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+    for (let i = m - 1; i >= 0; i--)
+        for (let j = n - 1; j >= 0; j--)
+            dp[i][j] = a[i] === b[j] ? dp[i+1][j+1] + 1 : Math.max(dp[i+1][j], dp[i][j+1]);
+
+    const result = [];
+    let i = 0, j = 0;
+    while (i < m || j < n) {
+        if (i < m && j < n && a[i] === b[j]) {
+            result.push({ type: 'eq',  text: a[i] }); i++; j++;
+        } else if (j < n && (i >= m || dp[i][j+1] >= dp[i+1][j])) {
+            result.push({ type: 'add', text: b[j] }); j++;
+        } else {
+            result.push({ type: 'del', text: a[i] }); i++;
+        }
+    }
+    return result;
+}
+
+function clearCompare() {
+    document.getElementById('compare-input-a').value = '';
+    document.getElementById('compare-input-b').value = '';
+    document.getElementById('diff-summary').innerHTML = '';
+    document.getElementById('diff-output').innerHTML = '';
+}
+
+// String Case Converter
+function toWords(input) {
+    return input
+        .replace(/([a-z])([A-Z])/g, '$1 $2')       // camelCase → words
+        .replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2') // ACRONYMWord → ACRONYM Word
+        .replace(/[-_]+/g, ' ')                      // hyphens/underscores → space
+        .trim()
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(w => w.length > 0);
+}
+
+function convertAllCases() {
+    const input = document.getElementById('string-case-input').value;
+    const words = toWords(input);
+
+    if (words.length === 0) {
+        ['camel','pascal','snake','kebab','constant','lower','upper','title'].forEach(id => {
+            document.getElementById(`case-${id}`).value = '';
+        });
+        return;
+    }
+
+    document.getElementById('case-camel').value =
+        words[0] + words.slice(1).map(w => w[0].toUpperCase() + w.slice(1)).join('');
+
+    document.getElementById('case-pascal').value =
+        words.map(w => w[0].toUpperCase() + w.slice(1)).join('');
+
+    document.getElementById('case-snake').value =
+        words.join('_');
+
+    document.getElementById('case-kebab').value =
+        words.join('-');
+
+    document.getElementById('case-constant').value =
+        words.join('_').toUpperCase();
+
+    document.getElementById('case-lower').value =
+        words.join(' ');
+
+    document.getElementById('case-upper').value =
+        words.join(' ').toUpperCase();
+
+    document.getElementById('case-title').value =
+        words.map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+}
+
+// SQL Formatter
+const SQL_KEYWORDS = [
+    'SELECT','DISTINCT','FROM','WHERE','AND','OR','NOT','IN','EXISTS','BETWEEN','LIKE','IS','NULL',
+    'JOIN','INNER JOIN','LEFT JOIN','RIGHT JOIN','FULL JOIN','FULL OUTER JOIN','CROSS JOIN','ON',
+    'GROUP BY','ORDER BY','HAVING','LIMIT','OFFSET','UNION','UNION ALL','INTERSECT','EXCEPT',
+    'INSERT INTO','VALUES','UPDATE','SET','DELETE FROM','CREATE TABLE','ALTER TABLE','DROP TABLE',
+    'CREATE INDEX','DROP INDEX','CREATE VIEW','DROP VIEW','AS','CASE','WHEN','THEN','ELSE','END',
+    'WITH','RECURSIVE','OVER','PARTITION BY','ROW_NUMBER','RANK','DENSE_RANK','COUNT','SUM',
+    'AVG','MIN','MAX','COALESCE','NULLIF','CAST','CONVERT','ASC','DESC','PRIMARY KEY',
+    'FOREIGN KEY','REFERENCES','NOT NULL','DEFAULT','UNIQUE','CHECK','CONSTRAINT','INDEX'
+];
+
+function tokenizeSQL(sql) {
+    const tokens = [];
+    let i = 0;
+    while (i < sql.length) {
+        // Skip whitespace
+        if (/\s/.test(sql[i])) { i++; continue; }
+        // Single-line comment
+        if (sql[i] === '-' && sql[i+1] === '-') {
+            let j = i;
+            while (j < sql.length && sql[j] !== '\n') j++;
+            tokens.push({ type: 'comment', val: sql.slice(i, j) });
+            i = j; continue;
+        }
+        // Block comment
+        if (sql[i] === '/' && sql[i+1] === '*') {
+            let j = i + 2;
+            while (j < sql.length && !(sql[j-1] === '*' && sql[j] === '/')) j++;
+            tokens.push({ type: 'comment', val: sql.slice(i, j+1) });
+            i = j + 1; continue;
+        }
+        // String literal
+        if (sql[i] === "'" || sql[i] === '"' || sql[i] === '`') {
+            const q = sql[i]; let j = i + 1;
+            while (j < sql.length && !(sql[j] === q && sql[j-1] !== '\\')) j++;
+            tokens.push({ type: 'string', val: sql.slice(i, j+1) });
+            i = j + 1; continue;
+        }
+        // Punctuation
+        if (/[(),;*]/.test(sql[i])) {
+            tokens.push({ type: 'punct', val: sql[i] }); i++; continue;
+        }
+        // Word / keyword
+        if (/[\w.]/.test(sql[i])) {
+            let j = i;
+            while (j < sql.length && /[\w.]/.test(sql[j])) j++;
+            const word = sql.slice(i, j);
+            const up = word.toUpperCase();
+            tokens.push({ type: SQL_KEYWORDS.includes(up) ? 'keyword' : 'word', val: word, up });
+            i = j; continue;
+        }
+        tokens.push({ type: 'other', val: sql[i] }); i++;
+    }
+    return tokens;
+}
+
+// Keywords that start a new line
+const NEWLINE_BEFORE = new Set([
+    'SELECT','FROM','WHERE','AND','OR','JOIN','INNER JOIN','LEFT JOIN','RIGHT JOIN',
+    'FULL JOIN','FULL OUTER JOIN','CROSS JOIN','GROUP BY','ORDER BY','HAVING',
+    'LIMIT','OFFSET','UNION','UNION ALL','INTERSECT','EXCEPT','INSERT INTO',
+    'VALUES','UPDATE','SET','DELETE FROM','ON','WITH','OVER','PARTITION BY'
+]);
+
+function validateSQL(standalone = false) {
+    const input = document.getElementById('sql-input').value.trim();
+    const validation = document.getElementById('sql-validation');
+
+    if (!input) {
+        validation.textContent = '';
+        validation.className = 'validation-message';
+        return { ok: false };
+    }
+
+    const errors = [];
+
+    // 1. Unterminated string literals
+    const strRe = /('([^'\\]|\\.)*'|"([^"\\]|\\.)*"|`([^`\\]|\\.)*`)/g;
+    const stripped = input.replace(strRe, '""').replace(/--[^\n]*/g, '').replace(/\/\*[\s\S]*?\*\//g, '');
+
+    const unterm = stripped.match(/['"`]/);
+    if (unterm) errors.push('Unterminated string literal');
+
+    // 2. Unclosed block comment
+    if (/\/\*/.test(stripped)) errors.push('Unclosed block comment');
+
+    // 3. Unbalanced parentheses
+    let depth = 0;
+    for (const ch of stripped) {
+        if (ch === '(') depth++;
+        else if (ch === ')') depth--;
+        if (depth < 0) { errors.push('Unexpected closing parenthesis'); break; }
+    }
+    if (depth > 0) errors.push(`${depth} unclosed parenthesis${depth > 1 ? 'es' : ''}`);
+
+    // 4. Each semicolon-separated statement must start with a known DML/DDL verb
+    const STMT_STARTERS = ['SELECT','INSERT','UPDATE','DELETE','CREATE','ALTER','DROP','WITH','TRUNCATE','MERGE','CALL','EXPLAIN','SHOW','DESCRIBE','GRANT','REVOKE'];
+    const stmts = stripped.split(';').map(s => s.trim()).filter(s => s.length > 0);
+    stmts.forEach((stmt, i) => {
+        const first = stmt.replace(/\s+/g, ' ').trim().split(' ')[0].toUpperCase();
+        if (!STMT_STARTERS.includes(first)) {
+            errors.push(`Statement ${i + 1} starts with unexpected token "${first}"`);
+        }
+    });
+
+    // 5. SELECT without FROM (unless it's SELECT <literal>, e.g. SELECT 1)
+    stmts.forEach((stmt, i) => {
+        const up = stmt.toUpperCase();
+        if (up.startsWith('SELECT') && !/\bFROM\b/.test(up)) {
+            // Allow SELECT of pure literals/expressions (no identifiers with dots or bare words after SELECT)
+            const afterSelect = up.replace(/^SELECT\s+/, '');
+            if (/[A-Z_][A-Z0-9_.]*\s*(?:,|\s+[A-Z])/.test(afterSelect)) {
+                errors.push(`Statement ${i + 1}: SELECT references columns but has no FROM clause`);
+            }
+        }
+    });
+
+    // 6. SELECT column list — items must be separated by commas
+    stmts.forEach((stmt, stmtIdx) => {
+        const tokens = tokenizeSQL(stmt);
+        const selectIdx = tokens.findIndex(t => t.up === 'SELECT');
+        if (selectIdx === -1) return;
+
+        // Start after SELECT (skip optional DISTINCT)
+        let start = selectIdx + 1;
+        if (tokens[start] && tokens[start].up === 'DISTINCT') start++;
+
+        // Collect tokens up to FROM (depth 0), ignoring subqueries in parens
+        const colTokens = [];
+        let d = 0;
+        for (let i = start; i < tokens.length; i++) {
+            const t = tokens[i];
+            if (t.type === 'punct' && t.val === '(') { d++; colTokens.push(t); continue; }
+            if (t.type === 'punct' && t.val === ')') { d--; colTokens.push(t); continue; }
+            if (d === 0 && t.type === 'keyword' && t.up === 'FROM') break;
+            colTokens.push(t);
+        }
+
+        if (colTokens.length === 0) return;
+        if (colTokens.length === 1 && colTokens[0].val === '*') return; // SELECT *
+
+        // Walk the flat (depth-0) token stream and check separators.
+        // Between two consecutive value-tokens at depth 0 there must be a comma.
+        // Value-tokens: words, strings, *, numbers; skip keywords used as modifiers (AS, ASC, DESC).
+        const SKIP_KW = new Set(['AS','ASC','DESC','DISTINCT']);
+        let expectComma = false;
+        let flatDepth = 0;
+
+        for (const t of colTokens) {
+            if (t.type === 'punct' && t.val === '(') { flatDepth++; continue; }
+            if (t.type === 'punct' && t.val === ')') { flatDepth--; continue; }
+            if (flatDepth > 0) continue; // inside subexpr / function call
+
+            if (t.type === 'punct' && t.val === ',') {
+                expectComma = false;
+                continue;
+            }
+
+            // Operators and other punctuation are part of an expression — don't flip state
+            if (t.type === 'other') continue;
+
+            // Modifier keywords that don't start a new column
+            if (t.type === 'keyword' && SKIP_KW.has(t.up)) continue;
+
+            // Anything else (word, string, keyword used as value like NULL/TRUE)
+            if (expectComma) {
+                errors.push(`Statement ${stmtIdx + 1}: missing comma in SELECT column list before "${t.val}"`);
+                break;
+            }
+            expectComma = true;
+        }
+    });
+
+    // 7. ORDER BY list — items must be separated by commas
+    const ORDER_BY_TERMINATORS = new Set(['LIMIT','OFFSET','UNION','UNION ALL','INTERSECT','EXCEPT','HAVING']);
+    const ORDER_BY_SKIP = new Set(['ASC','DESC','NULLS','FIRST','LAST']);
+
+    stmts.forEach((stmt, stmtIdx) => {
+        const tokens = tokenizeSQL(stmt);
+
+        // Find ORDER BY — it's two consecutive keyword tokens
+        let orderByIdx = -1;
+        for (let i = 0; i < tokens.length - 1; i++) {
+            if (tokens[i].up === 'ORDER' && tokens[i + 1].up === 'BY') {
+                orderByIdx = i + 2; // start after BY
+                break;
+            }
+        }
+        if (orderByIdx === -1) return;
+
+        // Collect tokens until a top-level terminator or end of statement
+        const orderTokens = [];
+        let d = 0;
+        for (let i = orderByIdx; i < tokens.length; i++) {
+            const t = tokens[i];
+            if (t.type === 'punct' && t.val === '(') { d++; orderTokens.push(t); continue; }
+            if (t.type === 'punct' && t.val === ')') { d--; orderTokens.push(t); continue; }
+            if (d === 0 && t.type === 'keyword' && ORDER_BY_TERMINATORS.has(t.up)) break;
+            orderTokens.push(t);
+        }
+
+        if (orderTokens.length === 0) {
+            errors.push(`Statement ${stmtIdx + 1}: ORDER BY has no columns`);
+            return;
+        }
+
+        let expectComma = false;
+        let flatDepth = 0;
+
+        for (const t of orderTokens) {
+            if (t.type === 'punct' && t.val === '(') { flatDepth++; continue; }
+            if (t.type === 'punct' && t.val === ')') { flatDepth--; continue; }
+            if (flatDepth > 0) continue;
+
+            if (t.type === 'punct' && t.val === ',') { expectComma = false; continue; }
+            if (t.type === 'other') continue;
+            if (t.type === 'keyword' && ORDER_BY_SKIP.has(t.up)) continue;
+
+            if (expectComma) {
+                errors.push(`Statement ${stmtIdx + 1}: missing comma in ORDER BY list before "${t.val}"`);
+                break;
+            }
+            expectComma = true;
+        }
+    });
+        validation.textContent = '✗ ' + errors[0] + (errors.length > 1 ? ` (+${errors.length - 1} more)` : '');
+        validation.className = 'validation-message error';
+        return { ok: false, errors };
+    }
+
+    if (standalone) {
+        validation.textContent = `✓ Valid SQL — ${stmts.length} statement${stmts.length !== 1 ? 's' : ''}`;
+        validation.className = 'validation-message success';
+    }
+
+    return { ok: true, stmts: stmts.length };
+}
+
+function formatSQL() {
+    const input = document.getElementById('sql-input').value.trim();
+    const validation = document.getElementById('sql-validation');
+
+    if (!input) {
+        validation.textContent = '';
+        validation.className = 'validation-message';
+        return;
+    }
+
+    const check = validateSQL(false);
+    if (!check.ok) return; // validation message already set
+
+    try {
+        const tokens = tokenizeSQL(input);
+        let out = '', indent = 0, col = 0;
+
+        const nl = (extra = 0) => {
+            out += '\n' + '  '.repeat(indent + extra);
+            col = (indent + extra) * 2;
+        };
+
+        tokens.forEach((tok, idx) => {
+            const up = tok.up || tok.val.toUpperCase();
+            const prev = idx > 0 ? tokens[idx - 1] : null;
+
+            if (tok.type === 'punct' && tok.val === '(') {
+                out += '('; col++; indent++;
+            } else if (tok.type === 'punct' && tok.val === ')') {
+                indent = Math.max(0, indent - 1);
+                nl(); out += ')'; col++;
+            } else if (tok.type === 'punct' && tok.val === ',') {
+                out += ','; nl();
+            } else if (tok.type === 'punct' && tok.val === ';') {
+                out += ';'; nl();
+            } else if (tok.type === 'keyword' && NEWLINE_BEFORE.has(up)) {
+                if (out.length > 0) nl();
+                out += up; col += up.length;
+            } else if (tok.type === 'keyword') {
+                if (prev && prev.type !== 'punct') { out += ' '; col++; }
+                out += up; col += up.length;
+            } else {
+                if (prev && prev.type !== 'punct' && prev.val !== '(') { out += ' '; col++; }
+                out += tok.val; col += tok.val.length;
+            }
+        });
+
+        document.getElementById('sql-output').value = out.trim();
+        const stmtCount = check.stmts || 1;
+        validation.textContent = `✓ Valid SQL — ${stmtCount} statement${stmtCount !== 1 ? 's' : ''}`;
+        validation.className = 'validation-message success';
+    } catch (error) {
+        validation.textContent = '✗ Error: ' + error.message;
+        validation.className = 'validation-message error';
+    }
+}
+
+function minifySQL() {
+    const input = document.getElementById('sql-input').value.trim();
+    const validation = document.getElementById('sql-validation');
+
+    if (!input) return;
+
+    const check = validateSQL(false);
+    if (!check.ok) return;
+
+    const tokens = tokenizeSQL(input);
+    let out = '';
+    tokens.forEach((tok, idx) => {
+        const prev = idx > 0 ? tokens[idx - 1] : null;
+        const up = tok.up || tok.val.toUpperCase();
+        const val = tok.type === 'keyword' ? up : tok.val;
+        const needsSpace = prev && prev.val !== '(' && tok.val !== ')' && tok.val !== ',' && tok.val !== ';' && tok.val !== '(';
+        out += (needsSpace ? ' ' : '') + val;
+    });
+
+    document.getElementById('sql-output').value = out.trim();
+    const stmtCount = check.stmts || 1;
+    validation.textContent = `✓ Valid SQL — minified, ${stmtCount} statement${stmtCount !== 1 ? 's' : ''}`;
+    validation.className = 'validation-message success';
+}
