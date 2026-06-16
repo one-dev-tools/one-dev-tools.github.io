@@ -1363,6 +1363,147 @@ textarea::placeholder {
     font-size: 12px;
 }
 
+/* ── Cron Generator ──────────────────────────────────────── */
+
+.cron-builder {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+}
+
+.cron-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.cron-field label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+}
+
+.cron-field input {
+    padding: 8px 10px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 15px;
+    background: var(--surface);
+    color: var(--ink);
+    text-align: center;
+    transition: border-color 0.15s;
+}
+
+.cron-field input:focus {
+    outline: none;
+    border-color: var(--g-generate);
+}
+
+.cron-field input.cron-error {
+    border-color: var(--error);
+    background: var(--error-bg);
+}
+
+.cron-output-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.cron-expression-input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    font-family: var(--font-mono);
+    font-size: 16px;
+    font-weight: 600;
+    background: var(--surface-alt);
+    color: var(--ink);
+    letter-spacing: 0.08em;
+    transition: border-color 0.15s;
+}
+
+.cron-expression-input:focus {
+    outline: none;
+    border-color: var(--g-generate);
+}
+
+.cron-description {
+    font-family: var(--font-ui);
+    font-size: 14px;
+    color: var(--ink-mid);
+    padding: 6px 2px;
+    min-height: 22px;
+}
+
+.cron-description.cron-desc-error {
+    color: var(--error);
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+.cron-next-label,
+.cron-presets-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rule);
+}
+
+.cron-next-runs {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cron-next-run-item {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--ink-mid);
+    padding: 5px 10px;
+    background: var(--surface-alt);
+    border-radius: 3px;
+    border: 1px solid var(--rule);
+}
+
+.cron-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.cron-presets button {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 5px 12px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    color: var(--ink-mid);
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, border-color 0.12s;
+    letter-spacing: 0.02em;
+    box-shadow: none;
+    transform: none;
+}
+
+.cron-presets button:hover {
+    background: var(--g-generate-dim);
+    border-color: var(--g-generate);
+    color: var(--g-generate);
+    transform: none;
+    box-shadow: none;
+}
+
 /* ── String Case Converter ───────────────────────────────── */
 
 #string-case .tool-input-panel {

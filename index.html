@@ -86,6 +86,10 @@
                 <span class="tool-label">Timestamp</span>
                 <span class="tool-hint">unix · ISO · locale</span>
             </button>
+            <button class="tool-btn" data-tool="cron-generator" data-group="generate">
+                <span class="tool-label">Cron</span>
+                <span class="tool-hint">build · explain · preview</span>
+            </button>
 
             <div class="nav-group-label">Utility</div>
             <button class="tool-btn" data-tool="color-converter" data-group="utility">
@@ -437,6 +441,65 @@
                         <input type="datetime-local" id="date-input">
                         <button onclick="convertDateToTimestamp()">Convert to timestamp</button>
                         <div id="date-output" class="timestamp-result"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cron Generator -->
+            <div class="tool-panel" id="cron-generator">
+                <h2>Cron Generator</h2>
+                <div class="tool-content">
+
+                    <!-- Builder -->
+                    <div class="cron-builder">
+                        <div class="cron-field">
+                            <label>Minute</label>
+                            <input type="text" id="cron-minute"  value="*" oninput="cronUpdate()">
+                        </div>
+                        <div class="cron-field">
+                            <label>Hour</label>
+                            <input type="text" id="cron-hour"    value="*" oninput="cronUpdate()">
+                        </div>
+                        <div class="cron-field">
+                            <label>Day (month)</label>
+                            <input type="text" id="cron-dom"     value="*" oninput="cronUpdate()">
+                        </div>
+                        <div class="cron-field">
+                            <label>Month</label>
+                            <input type="text" id="cron-month"   value="*" oninput="cronUpdate()">
+                        </div>
+                        <div class="cron-field">
+                            <label>Day (week)</label>
+                            <input type="text" id="cron-dow"     value="*" oninput="cronUpdate()">
+                        </div>
+                    </div>
+
+                    <!-- Expression output -->
+                    <div class="cron-output-row">
+                        <input type="text" id="cron-expression" class="cron-expression-input" placeholder="* * * * *" oninput="cronParse()">
+                        <button class="copy-btn" onclick="copyToClipboardFromInput('cron-expression')">Copy</button>
+                    </div>
+
+                    <!-- Human-readable description -->
+                    <div class="cron-description" id="cron-description"></div>
+
+                    <!-- Next runs -->
+                    <div class="cron-next-label">Next 5 runs</div>
+                    <div class="cron-next-runs" id="cron-next-runs"></div>
+
+                    <!-- Quick presets -->
+                    <div class="cron-presets-label">Presets</div>
+                    <div class="cron-presets">
+                        <button onclick="cronSetPreset('* * * * *')">Every minute</button>
+                        <button onclick="cronSetPreset('0 * * * *')">Every hour</button>
+                        <button onclick="cronSetPreset('0 0 * * *')">Daily midnight</button>
+                        <button onclick="cronSetPreset('0 9 * * *')">Daily 9am</button>
+                        <button onclick="cronSetPreset('0 9 * * 1-5')">Weekdays 9am</button>
+                        <button onclick="cronSetPreset('0 0 * * 0')">Weekly Sunday</button>
+                        <button onclick="cronSetPreset('0 0 1 * *')">Monthly 1st</button>
+                        <button onclick="cronSetPreset('*/5 * * * *')">Every 5 min</button>
+                        <button onclick="cronSetPreset('*/15 * * * *')">Every 15 min</button>
+                        <button onclick="cronSetPreset('0 0 1 1 *')">Yearly Jan 1st</button>
                     </div>
                 </div>
             </div>

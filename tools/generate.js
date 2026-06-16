@@ -289,3 +289,196 @@ function hslToHex(h, s, l) {
     else              { r=c; g=0; b=x; }
     return rgbToHex(Math.round((r+m)*255), Math.round((g+m)*255), Math.round((b+m)*255));
 }
+
+// ── Cron Generator ────────────────────────────────────────
+
+const CRON_MONTHS  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const CRON_DAYS    = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function cronFieldValid(val, min, max) {
+    if (val === '*') return true;
+    // */n
+    if (/^\*\/\d+$/.test(val)) {
+        const n = parseInt(val.slice(2));
+        return n >= 1 && n <= max;
+    }
+    // ranges and lists: e.g. 1-5, 1,3,5, 1-5,7
+    const parts = val.split(',');
+    return parts.every(p => {
+        const range = p.split('-');
+        if (range.length === 2) {
+            const [a, b] = range.map(Number);
+            return !isNaN(a) && !isNaN(b) && a >= min && b <= max && a <= b;
+        }
+        const n = Number(p);
+        return !isNaN(n) && n >= min && n <= max;
+    });
+}
+
+function cronDescribeField(val, singular, plural, names, offset = 0) {
+    if (val === '*') return `every ${singular}`;
+    if (/^\*\/\d+$/.test(val)) return `every ${val.slice(2)} ${plural}`;
+    const parts = val.split(',');
+    const labels = parts.flatMap(p => {
+        const range = p.split('-');
+        if (range.length === 2) {
+            const [a, b] = range.map(Number);
+            const from = names ? names[a - offset] : a;
+            const to   = names ? names[b - offset] : b;
+            return [`${from}–${to}`];
+        }
+        const n = parseInt(p);
+        return [names ? names[n - offset] : n];
+    });
+    return labels.join(', ');
+}
+
+function cronDescribe(minute, hour, dom, month, dow) {
+    const errors = [];
+    if (!cronFieldValid(minute,  0, 59)) errors.push('minute');
+    if (!cronFieldValid(hour,    0, 23)) errors.push('hour');
+    if (!cronFieldValid(dom,     1, 31)) errors.push('day-of-month');
+    if (!cronFieldValid(month,   1, 12)) errors.push('month');
+    if (!cronFieldValid(dow,     0,  6)) errors.push('day-of-week');
+    if (errors.length) return { ok: false, error: `Invalid value in: ${errors.join(', ')}` };
+
+    const mDesc   = cronDescribeField(minute,  'minute',   'minutes');
+    const hDesc   = cronDescribeField(hour,    'hour',     'hours');
+    const domDesc = cronDescribeField(dom,     'day',      'days');
+    const monDesc = cronDescribeField(month,   'month',    'months',   CRON_MONTHS, 1);
+    const dowDesc = cronDescribeField(dow,     'weekday',  'weekdays', CRON_DAYS,   0);
+
+    let desc = 'At ';
+    if (minute === '*' && hour === '*') {
+        desc += 'every minute';
+    } else if (minute.startsWith('*/')) {
+        desc += `every ${minute.slice(2)} minutes`;
+        if (hour !== '*') desc += ` past ${hDesc}`;
+    } else {
+        const mins = minute === '*' ? '00' : minute.padStart(2, '0');
+        desc += hour === '*' ? `minute ${mins} of every hour` : `${hour.padStart(2,'0')}:${mins}`;
+    }
+    if (dom !== '*')   desc += `, on day ${domDesc}`;
+    if (dow !== '*')   desc += `, on ${dowDesc}`;
+    if (month !== '*') desc += `, in ${monDesc}`;
+
+    return { ok: true, desc };
+}
+
+// Compute next N run times from now
+function cronNextRuns(minute, hour, dom, month, dow, count = 5) {
+    const now  = new Date();
+    const runs = [];
+    // Step minute by minute from now+1min, cap at 1 year of iterations
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1, 0, 0);
+    let   d     = new Date(start);
+    let   iters = 0;
+
+    const matches = (val, n, min, max) => {
+        if (val === '*') return true;
+        if (/^\*\/\d+$/.test(val)) return (n - min) % parseInt(val.slice(2)) === 0;
+        return val.split(',').some(p => {
+            const range = p.split('-');
+            if (range.length === 2) return n >= parseInt(range[0]) && n <= parseInt(range[1]);
+            return parseInt(p) === n;
+        });
+    };
+
+    while (runs.length < count && iters < 525600) {
+        iters++;
+        const mi = d.getMinutes(), hr = d.getHours(),
+              dm = d.getDate(),    mo = d.getMonth() + 1, dw = d.getDay();
+        if (matches(minute, mi, 0, 59) && matches(hour, hr, 0, 23) &&
+            matches(dom, dm, 1, 31)    && matches(month, mo, 1, 12) &&
+            matches(dow, dw, 0, 6)) {
+            runs.push(new Date(d));
+        }
+        d.setMinutes(d.getMinutes() + 1);
+    }
+    return runs;
+}
+
+function cronUpdate() {
+    const minute = document.getElementById('cron-minute').value.trim();
+    const hour   = document.getElementById('cron-hour').value.trim();
+    const dom    = document.getElementById('cron-dom').value.trim();
+    const month  = document.getElementById('cron-month').value.trim();
+    const dow    = document.getElementById('cron-dow').value.trim();
+
+    const expr = [minute, hour, dom, month, dow].join(' ');
+    document.getElementById('cron-expression').value = expr;
+
+    cronRender(minute, hour, dom, month, dow);
+}
+
+function cronParse() {
+    const expr   = document.getElementById('cron-expression').value.trim();
+    const parts  = expr.split(/\s+/);
+    if (parts.length !== 5) {
+        document.getElementById('cron-description').textContent = 'Expression must have exactly 5 fields.';
+        document.getElementById('cron-description').className   = 'cron-description cron-desc-error';
+        document.getElementById('cron-next-runs').innerHTML     = '';
+        return;
+    }
+    const [minute, hour, dom, month, dow] = parts;
+    document.getElementById('cron-minute').value = minute;
+    document.getElementById('cron-hour').value   = hour;
+    document.getElementById('cron-dom').value    = dom;
+    document.getElementById('cron-month').value  = month;
+    document.getElementById('cron-dow').value    = dow;
+
+    // Clear error states
+    ['cron-minute','cron-hour','cron-dom','cron-month','cron-dow'].forEach(id =>
+        document.getElementById(id).classList.remove('cron-error'));
+
+    cronRender(minute, hour, dom, month, dow);
+}
+
+function cronRender(minute, hour, dom, month, dow) {
+    const descEl  = document.getElementById('cron-description');
+    const nextEl  = document.getElementById('cron-next-runs');
+    const fields  = [
+        { id: 'cron-minute', val: minute,  min: 0, max: 59 },
+        { id: 'cron-hour',   val: hour,    min: 0, max: 23 },
+        { id: 'cron-dom',    val: dom,     min: 1, max: 31 },
+        { id: 'cron-month',  val: month,   min: 1, max: 12 },
+        { id: 'cron-dow',    val: dow,     min: 0, max:  6 },
+    ];
+
+    fields.forEach(f => {
+        const el = document.getElementById(f.id);
+        if (cronFieldValid(f.val, f.min, f.max)) el.classList.remove('cron-error');
+        else el.classList.add('cron-error');
+    });
+
+    const result = cronDescribe(minute, hour, dom, month, dow);
+    if (!result.ok) {
+        descEl.textContent = result.error;
+        descEl.className   = 'cron-description cron-desc-error';
+        nextEl.innerHTML   = '';
+        return;
+    }
+
+    descEl.textContent = result.desc;
+    descEl.className   = 'cron-description';
+
+    const runs = cronNextRuns(minute, hour, dom, month, dow);
+    const locale = navigator.language || 'en-US';
+    nextEl.innerHTML = runs.map(d =>
+        `<div class="cron-next-run-item">${d.toLocaleString(locale, {
+            weekday: 'short', year: 'numeric', month: 'short',
+            day: 'numeric', hour: '2-digit', minute: '2-digit'
+        })}</div>`
+    ).join('');
+}
+
+function cronSetPreset(expr) {
+    document.getElementById('cron-expression').value = expr;
+    cronParse();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initial render with default * * * * *
+    const btn = document.querySelector('[data-tool="cron-generator"]');
+    if (btn) btn.addEventListener('click', () => cronRender('*','*','*','*','*'));
+});
