@@ -392,7 +392,7 @@ body {
     border-bottom: 1px solid var(--rule);
 }
 
-.todo-item:nth-child(even) {
+.todo-item:nth-child(even):not(.done) {
     background: var(--surface-alt);
 }
     border-radius: 3px;
@@ -414,12 +414,13 @@ body {
 }
 
 .todo-item.done {
-    color: var(--ink-faint);
-    background: var(--surface-alt);
+    color: var(--ink-mid);
+    background: var(--g-personal-dim);
+    border-color: var(--g-personal-dim);
 }
 
 .todo-item.done .todo-text {
-    text-decoration: line-through;
+    text-decoration: none;
 }
 
 .todo-check {
