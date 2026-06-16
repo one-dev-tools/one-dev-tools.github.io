@@ -112,6 +112,10 @@
                 <span class="tool-label">Markdown</span>
                 <span class="tool-hint">preview rendered output</span>
             </button>
+            <button class="tool-btn" data-tool="http-status" data-group="utility">
+                <span class="tool-label">HTTP Status</span>
+                <span class="tool-hint">quick reference</span>
+            </button>
         </nav>
 
         <div class="sidebar-footer">
@@ -801,6 +805,17 @@
                             <div class="markdown-preview-pane" id="markdown-output"></div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- HTTP Status Codes -->
+            <div class="tool-panel" id="http-status">
+                <h2>HTTP Status Codes</h2>
+                <div class="tool-content">
+                    <input type="text" id="http-status-search" class="http-status-search"
+                        placeholder="Search by code or description… e.g. 404 or Not Found"
+                        oninput="httpStatusFilter()">
+                    <div id="http-status-list"></div>
                 </div>
             </div>
 

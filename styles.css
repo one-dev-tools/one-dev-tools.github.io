@@ -1555,6 +1555,128 @@ textarea::placeholder {
     flex-shrink: 0;
 }
 
+/* ── HTTP Status Codes ───────────────────────────────────── */
+
+.http-status-search {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    font-family: var(--font-ui);
+    font-size: 14px;
+    background: var(--surface);
+    color: var(--ink);
+}
+
+.http-status-search:focus {
+    outline: none;
+    border-color: var(--g-utility);
+}
+
+.http-status-group {
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.http-status-group-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--surface-alt);
+    cursor: pointer;
+    user-select: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+    transition: background 0.12s;
+    box-shadow: none;
+    transform: none;
+}
+
+.http-status-group-header:hover {
+    background: var(--rule);
+    transform: none;
+    box-shadow: none;
+}
+
+.http-status-group-toggle {
+    font-size: 9px;
+    color: var(--ink-faint);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+
+.http-status-group.open .http-status-group-toggle {
+    transform: rotate(90deg);
+}
+
+.http-status-group-badge {
+    font-size: 10px;
+    font-weight: 500;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-left: auto;
+    color: var(--surface);
+}
+
+.http-status-rows {
+    display: none;
+}
+
+.http-status-group.open .http-status-rows {
+    display: block;
+}
+
+.http-status-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 8px 14px;
+    border-top: 1px solid var(--rule);
+    transition: background 0.1s;
+}
+
+.http-status-row:hover {
+    background: var(--surface-alt);
+}
+
+.http-status-code {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 42px;
+    flex-shrink: 0;
+}
+
+.http-status-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    min-width: 160px;
+    flex-shrink: 0;
+}
+
+.http-status-desc {
+    font-size: 12px;
+    color: var(--ink-faint);
+    line-height: 1.5;
+}
+
+.http-status-no-results {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-style: italic;
+    padding: 16px 0;
+}
+
 /* ── Regex Tester ────────────────────────────────────────── */
 
 .regex-controls {

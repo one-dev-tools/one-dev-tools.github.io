@@ -240,6 +240,147 @@ function parseMarkdown(src) {
     return html;
 }
 
+// ── HTTP Status Codes ─────────────────────────────────────
+
+const HTTP_STATUSES = [
+    {
+        group: '1xx Informational', color: '#6A8A9A', codes: [
+            { code: 100, name: 'Continue',            desc: 'The server has received the request headers; the client should proceed to send the body.' },
+            { code: 101, name: 'Switching Protocols',  desc: 'The requester has asked the server to switch protocols.' },
+            { code: 102, name: 'Processing',           desc: 'The server has received and is processing the request, but no response is available yet.' },
+            { code: 103, name: 'Early Hints',          desc: 'Used to return some response headers before final HTTP message.' },
+        ]
+    },
+    {
+        group: '2xx Success', color: '#3A6B4A', codes: [
+            { code: 200, name: 'OK',                   desc: 'Standard successful response.' },
+            { code: 201, name: 'Created',              desc: 'The request succeeded and a new resource was created.' },
+            { code: 202, name: 'Accepted',             desc: 'The request has been accepted for processing, but processing is not complete.' },
+            { code: 203, name: 'Non-Authoritative Info', desc: 'The response is from a transforming proxy, not the origin server.' },
+            { code: 204, name: 'No Content',           desc: 'The server successfully processed the request but is not returning any content.' },
+            { code: 205, name: 'Reset Content',        desc: 'Tells the client to reset the document view.' },
+            { code: 206, name: 'Partial Content',      desc: 'The server is delivering only part of the resource (byte range).' },
+            { code: 207, name: 'Multi-Status',         desc: 'Multiple independent operations (WebDAV).' },
+            { code: 208, name: 'Already Reported',     desc: 'Members of a DAV binding have already been enumerated.' },
+            { code: 226, name: 'IM Used',              desc: 'The server fulfilled a GET request using instance manipulations.' },
+        ]
+    },
+    {
+        group: '3xx Redirection', color: '#7A6A45', codes: [
+            { code: 300, name: 'Multiple Choices',     desc: 'Multiple options for the resource; the user or browser should choose one.' },
+            { code: 301, name: 'Moved Permanently',    desc: 'The URL has been permanently moved. Future requests should use the new URL.' },
+            { code: 302, name: 'Found',                desc: 'Temporary redirect. The resource is temporarily under a different URL.' },
+            { code: 303, name: 'See Other',            desc: 'The response to the request can be found under another URL (GET).' },
+            { code: 304, name: 'Not Modified',         desc: 'The cached version is still valid; no need to retransmit.' },
+            { code: 307, name: 'Temporary Redirect',   desc: 'Temporary redirect; the method and body are not changed.' },
+            { code: 308, name: 'Permanent Redirect',   desc: 'Permanent redirect; the method and body are not changed.' },
+        ]
+    },
+    {
+        group: '4xx Client Errors', color: '#8B3030', codes: [
+            { code: 400, name: 'Bad Request',          desc: 'The server cannot process the request due to malformed syntax.' },
+            { code: 401, name: 'Unauthorized',         desc: 'Authentication is required and has failed or not been provided.' },
+            { code: 402, name: 'Payment Required',     desc: 'Reserved for future use; sometimes used for digital payment.' },
+            { code: 403, name: 'Forbidden',            desc: 'The client does not have access rights to the content.' },
+            { code: 404, name: 'Not Found',            desc: 'The server cannot find the requested resource.' },
+            { code: 405, name: 'Method Not Allowed',   desc: 'The request method is not supported for the requested resource.' },
+            { code: 406, name: 'Not Acceptable',       desc: 'No content matching the Accept headers.' },
+            { code: 407, name: 'Proxy Auth Required',  desc: 'The client must authenticate with the proxy.' },
+            { code: 408, name: 'Request Timeout',      desc: 'The server timed out waiting for the request.' },
+            { code: 409, name: 'Conflict',             desc: 'Request conflict with the current state of the server.' },
+            { code: 410, name: 'Gone',                 desc: 'The resource has been permanently deleted and will not return.' },
+            { code: 411, name: 'Length Required',      desc: 'Content-Length header is required.' },
+            { code: 412, name: 'Precondition Failed',  desc: 'One or more conditions in the request header fields evaluated to false.' },
+            { code: 413, name: 'Content Too Large',    desc: 'The request body is larger than the server is willing to process.' },
+            { code: 414, name: 'URI Too Long',         desc: 'The URI provided is longer than the server is willing to process.' },
+            { code: 415, name: 'Unsupported Media',    desc: 'The media format of the requested data is not supported.' },
+            { code: 416, name: 'Range Not Satisfiable',desc: 'The requested range cannot be fulfilled.' },
+            { code: 417, name: 'Expectation Failed',   desc: 'The Expect header cannot be met by the server.' },
+            { code: 418, name: "I'm a Teapot",         desc: 'The server refuses to brew coffee because it is a teapot (RFC 2324).' },
+            { code: 421, name: 'Misdirected Request',  desc: 'The request was directed at a server unable to produce a response.' },
+            { code: 422, name: 'Unprocessable Content',desc: 'The request was well-formed but contains semantic errors.' },
+            { code: 423, name: 'Locked',               desc: 'The resource is locked (WebDAV).' },
+            { code: 424, name: 'Failed Dependency',    desc: 'The request failed due to failure of a previous request (WebDAV).' },
+            { code: 425, name: 'Too Early',            desc: 'The server is unwilling to risk processing a replayed request.' },
+            { code: 426, name: 'Upgrade Required',     desc: 'The client should switch to a different protocol.' },
+            { code: 428, name: 'Precondition Required',desc: 'The server requires the request to be conditional.' },
+            { code: 429, name: 'Too Many Requests',    desc: 'The client has sent too many requests in a given amount of time (rate limiting).' },
+            { code: 431, name: 'Headers Too Large',    desc: 'The server is unwilling to process the request because its header fields are too large.' },
+            { code: 451, name: 'Unavailable For Legal',desc: 'The resource is unavailable due to a legal demand.' },
+        ]
+    },
+    {
+        group: '5xx Server Errors', color: '#6B5C70', codes: [
+            { code: 500, name: 'Internal Server Error',desc: 'A generic error when the server encounters an unexpected condition.' },
+            { code: 501, name: 'Not Implemented',      desc: 'The server does not support the functionality required to fulfil the request.' },
+            { code: 502, name: 'Bad Gateway',          desc: 'The server received an invalid response from an upstream server.' },
+            { code: 503, name: 'Service Unavailable',  desc: 'The server is not ready to handle the request (down for maintenance or overloaded).' },
+            { code: 504, name: 'Gateway Timeout',      desc: 'The server did not get a response in time from the upstream server.' },
+            { code: 505, name: 'HTTP Version Not Supported', desc: 'The HTTP version used in the request is not supported.' },
+            { code: 506, name: 'Variant Also Negotiates', desc: 'Transparent content negotiation results in a circular reference.' },
+            { code: 507, name: 'Insufficient Storage', desc: 'The server is unable to store the representation needed (WebDAV).' },
+            { code: 508, name: 'Loop Detected',        desc: 'The server detected an infinite loop while processing the request (WebDAV).' },
+            { code: 510, name: 'Not Extended',         desc: 'Further extensions to the request are required.' },
+            { code: 511, name: 'Network Auth Required',desc: 'The client needs to authenticate to gain network access.' },
+        ]
+    },
+];
+
+function httpStatusRender(filter = '') {
+    const listEl = document.getElementById('http-status-list');
+    if (!listEl) return;
+
+    const q = filter.trim().toLowerCase();
+    let anyVisible = false;
+    let html = '<div style="display:flex;flex-direction:column;gap:8px;">';
+
+    HTTP_STATUSES.forEach((group, gi) => {
+        const rows = group.codes.filter(c =>
+            !q ||
+            String(c.code).includes(q) ||
+            c.name.toLowerCase().includes(q) ||
+            c.desc.toLowerCase().includes(q)
+        );
+        if (rows.length === 0) return;
+        anyVisible = true;
+
+        const isOpen = q || gi === 0; // open by default only first group (or all when searching)
+        html += `
+        <div class="http-status-group${isOpen ? ' open' : ''}" id="http-group-${gi}">
+            <button class="http-status-group-header" onclick="httpStatusToggle(${gi})">
+                <span class="http-status-group-toggle">▶</span>
+                ${escapeHtml(group.group)}
+                <span class="http-status-group-badge" style="background:${group.color}">${rows.length}</span>
+            </button>
+            <div class="http-status-rows">
+                ${rows.map(c => `
+                <div class="http-status-row">
+                    <span class="http-status-code" style="color:${group.color}">${c.code}</span>
+                    <span class="http-status-name">${escapeHtml(c.name)}</span>
+                    <span class="http-status-desc">${escapeHtml(c.desc)}</span>
+                </div>`).join('')}
+            </div>
+        </div>`;
+    });
+
+    if (!anyVisible) {
+        html += `<div class="http-status-no-results">No matching status codes.</div>`;
+    }
+
+    html += '</div>';
+    listEl.innerHTML = html;
+}
+
+function httpStatusToggle(gi) {
+    const el = document.getElementById(`http-group-${gi}`);
+    if (el) el.classList.toggle('open');
+}
+
+function httpStatusFilter() {
+    const q = document.getElementById('http-status-search').value;
+    httpStatusRender(q);
+}
+
 // ── To-Do List ────────────────────────────────────────────
 
 const TODO_KEY = 'onedevtools_todos';
@@ -384,8 +525,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     document.querySelectorAll('.tool-btn').forEach(btn => {
-        if (btn.getAttribute('data-tool') === 'todo-list') btn.addEventListener('click', todoRender);
+        if (btn.getAttribute('data-tool') === 'todo-list')   btn.addEventListener('click', todoRender);
+        if (btn.getAttribute('data-tool') === 'http-status') btn.addEventListener('click', () => httpStatusRender(document.getElementById('http-status-search')?.value || ''));
     });
 
     todoRender();
+    httpStatusRender();
 });
