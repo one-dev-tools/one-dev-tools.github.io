@@ -58,11 +58,30 @@ function decodeJWT() {
         if (parts.length !== 3) throw new Error('JWT must have 3 parts separated by dots.');
 
         document.getElementById('jwt-header').innerHTML    = formatJWTWithTooltips(JSON.parse(atob(parts[0])));
-        document.getElementById('jwt-payload').innerHTML   = formatJWTWithTooltips(JSON.parse(atob(parts[1])));
+        const payload = JSON.parse(atob(parts[1]));
+        document.getElementById('jwt-payload').innerHTML   = formatJWTWithTooltips(payload);
         document.getElementById('jwt-signature').textContent = parts[2];
 
-        validation.textContent = '✓ JWT decoded successfully';
-        validation.className   = 'validation-message success';
+        // Expiry indicator
+        const now = Math.floor(Date.now() / 1000);
+        if (payload.exp) {
+            const secsLeft = payload.exp - now;
+            if (secsLeft < 0) {
+                const ago = formatExpiredAgo(-secsLeft);
+                validation.textContent = `✗ JWT expired ${ago} ago`;
+                validation.className   = 'validation-message error';
+            } else if (secsLeft < 300) {
+                const mins = Math.ceil(secsLeft / 60);
+                validation.textContent = `⚠ JWT expires in ${mins < 1 ? 'less than a minute' : mins + ' minute' + (mins !== 1 ? 's' : '')}`;
+                validation.className   = 'validation-message warning';
+            } else {
+                validation.textContent = '✓ JWT decoded — valid';
+                validation.className   = 'validation-message success';
+            }
+        } else {
+            validation.textContent = '✓ JWT decoded — no expiry claim';
+            validation.className   = 'validation-message success';
+        }
     } catch (e) {
         validation.textContent = '✗ Invalid JWT: ' + e.message;
         validation.className   = 'validation-message error';
@@ -70,6 +89,13 @@ function decodeJWT() {
             document.getElementById(id).textContent = '';
         });
     }
+}
+
+function formatExpiredAgo(secs) {
+    if (secs < 60)   return `${secs} second${secs !== 1 ? 's' : ''}`;
+    if (secs < 3600) { const m = Math.floor(secs/60);   return `${m} minute${m !== 1 ? 's' : ''}`; }
+    if (secs < 86400){ const h = Math.floor(secs/3600); return `${h} hour${h !== 1 ? 's' : ''}`; }
+    const d = Math.floor(secs/86400); return `${d} day${d !== 1 ? 's' : ''}`;
 }
 
 function formatJWTWithTooltips(obj) {

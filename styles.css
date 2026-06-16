@@ -740,6 +740,26 @@ button:active {
     border-left-color: var(--error);
 }
 
+.validation-message.warning {
+    background: #FDF3E0;
+    color: #8A5A00;
+    border-left-color: #C8860A;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .validation-message.warning {
+        background: #2A2010;
+        color: #D4A040;
+        border-left-color: #C8860A;
+    }
+}
+
+:root[data-theme="dark"] .validation-message.warning {
+    background: #2A2010;
+    color: #D4A040;
+    border-left-color: #C8860A;
+}
+
 /* ── Split view ──────────────────────────────────────────── */
 
 .tool-content {
