@@ -193,6 +193,58 @@ function renderMarkdown() {
         parseMarkdown(document.getElementById('markdown-input').value);
 }
 
+function parseMarkdownLists(text) {
+    // Split into lines, group contiguous list blocks, build nested <ul>
+    const lines  = text.split('\n');
+    const out    = [];
+    let   i      = 0;
+
+    const isBullet = line => /^(\s*)[*\-+] /.test(line);
+
+    const buildList = (block) => {
+        // block: array of {indent, text} objects
+        const html  = [];
+        let   j     = 0;
+        while (j < block.length) {
+            const { indent, text } = block[j];
+            // Collect children (deeper indent)
+            const children = [];
+            j++;
+            while (j < block.length && block[j].indent > indent) {
+                children.push(block[j]);
+                j++;
+            }
+            if (children.length > 0) {
+                html.push(`<li>${text}${buildList(children)}</li>`);
+            } else {
+                html.push(`<li>${text}</li>`);
+            }
+        }
+        return `<ul>${html.join('')}</ul>`;
+    };
+
+    while (i < lines.length) {
+        if (isBullet(lines[i])) {
+            // Collect all contiguous bullet lines (including blank lines between items)
+            const block = [];
+            while (i < lines.length && (isBullet(lines[i]) || (lines[i].trim() === '' && i + 1 < lines.length && isBullet(lines[i + 1])))) {
+                if (lines[i].trim() === '') { i++; continue; }
+                const m      = lines[i].match(/^(\s*)[*\-+] (.*)/);
+                const indent = m[1].length;
+                const text   = m[2];
+                block.push({ indent, text });
+                i++;
+            }
+            if (block.length > 0) out.push(buildList(block));
+        } else {
+            out.push(lines[i]);
+            i++;
+        }
+    }
+
+    return out.join('\n');
+}
+
 function parseMarkdown(src) {
     let html = src.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
@@ -204,8 +256,8 @@ function parseMarkdown(src) {
     html = html.replace(/^(---|\*\*\*|___)\s*$/gm, '<hr>');
     html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
 
-    html = html.replace(/(^[*\-+] .+(\n[*\-+] .+)*)/gm, match =>
-        `<ul>${match.trim().split('\n').map(l=>`<li>${l.replace(/^[*\-+] /,'')}</li>`).join('')}</ul>`);
+    // Lists — handle indented sub-bullets recursively
+    html = parseMarkdownLists(html);
 
     html = html.replace(/(^\d+\. .+(\n\d+\. .+)*)/gm, match =>
         `<ol>${match.trim().split('\n').map(l=>`<li>${l.replace(/^\d+\. /,'')}</li>`).join('')}</ol>`);
