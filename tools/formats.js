@@ -686,3 +686,105 @@ function minifySQL() {
     validation.textContent = `✓ Valid SQL — minified, ${check.stmts} statement${check.stmts !== 1 ? 's' : ''}`;
     validation.className   = 'validation-message success';
 }
+
+// ── Spring Boot YAML ↔ Properties ────────────────────────
+
+// Pure logic — testable
+
+function yamlToPropsLogic(yamlStr) {
+    const parsed = jsyaml.load(yamlStr);
+    if (parsed === null || parsed === undefined) return '';
+    const lines = [];
+    function flatten(obj, prefix) {
+        if (obj === null || obj === undefined) {
+            lines.push(`${prefix}=`);
+        } else if (Array.isArray(obj)) {
+            obj.forEach((item, i) => flatten(item, `${prefix}[${i}]`));
+        } else if (typeof obj === 'object') {
+            Object.keys(obj).forEach(k => flatten(obj[k], prefix ? `${prefix}.${k}` : k));
+        } else {
+            lines.push(`${prefix}=${obj}`);
+        }
+    }
+    flatten(parsed, '');
+    // Remove leading dot from top-level keys (flatten('', prefix='') adds empty prefix)
+    return lines.map(l => l.startsWith('.') ? l.slice(1) : l).join('\n');
+}
+
+function propsToYAMLLogic(propsStr) {
+    const root = {};
+    const lines = propsStr.split('\n');
+
+    lines.forEach(line => {
+        const trimmed = line.trim();
+        // Skip blank lines and comments
+        if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('!')) return;
+
+        // Split on first = or :
+        const sep = trimmed.search(/(?<!\\)[=:]/);
+        if (sep === -1) return;
+
+        const rawKey = trimmed.slice(0, sep).trim();
+        const value  = trimmed.slice(sep + 1).trim();
+
+        // Parse key segments, handle array indices like key[0]
+        const segments = [];
+        rawKey.split('.').forEach(part => {
+            const arrMatch = part.match(/^(.+?)\[(\d+)\]$/);
+            if (arrMatch) { segments.push(arrMatch[1]); segments.push(parseInt(arrMatch[2])); }
+            else segments.push(part);
+        });
+
+        // Build nested object
+        let node = root;
+        for (let i = 0; i < segments.length - 1; i++) {
+            const seg  = segments[i];
+            const next = segments[i + 1];
+            if (node[seg] === undefined) {
+                node[seg] = typeof next === 'number' ? [] : {};
+            }
+            node = node[seg];
+        }
+        const last = segments[segments.length - 1];
+        // Coerce booleans and numbers
+        let coerced = value;
+        if (value === 'true')  coerced = true;
+        else if (value === 'false') coerced = false;
+        else if (value !== '' && !isNaN(value) && !value.startsWith('0') && value.indexOf(':') === -1) coerced = Number(value);
+        node[last] = coerced;
+    });
+
+    return jsyaml.dump(root, { indent: 2, lineWidth: -1 });
+}
+
+function convertYAMLtoProps() {
+    const input      = document.getElementById('yaml-to-props-input').value.trim();
+    const validation = document.getElementById('yaml-to-props-validation');
+    try {
+        const result = yamlToPropsLogic(input);
+        document.getElementById('yaml-to-props-output').value = result;
+        const count = result.split('\n').filter(l => l.trim()).length;
+        validation.textContent = `✓ Converted — ${count} propert${count !== 1 ? 'ies' : 'y'}`;
+        validation.className   = 'validation-message success';
+    } catch (e) {
+        validation.textContent = '✗ Invalid YAML: ' + e.message;
+        validation.className   = 'validation-message error';
+        document.getElementById('yaml-to-props-output').value = '';
+    }
+}
+
+function convertPropsToYAML() {
+    const input      = document.getElementById('props-to-yaml-input').value.trim();
+    const validation = document.getElementById('props-to-yaml-validation');
+    try {
+        if (!input) throw new Error('Input is empty');
+        const result = propsToYAMLLogic(input);
+        document.getElementById('props-to-yaml-output').value = result;
+        validation.textContent = '✓ Converted successfully';
+        validation.className   = 'validation-message success';
+    } catch (e) {
+        validation.textContent = '✗ ' + e.message;
+        validation.className   = 'validation-message error';
+        document.getElementById('props-to-yaml-output').value = '';
+    }
+}

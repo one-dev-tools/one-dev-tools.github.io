@@ -72,6 +72,10 @@
                 <span class="tool-label">JSON ↔ CSV</span>
                 <span class="tool-hint">convert between formats</span>
             </button>
+            <button class="tool-btn" data-tool="spring-props" data-group="format">
+                <span class="tool-label">YAML ↔ Properties</span>
+                <span class="tool-hint">Spring Boot config</span>
+            </button>
 
             <div class="nav-group-label">Generate</div>
             <button class="tool-btn" data-tool="uuid-generator" data-group="generate">
@@ -654,7 +658,67 @@
                 </div>
             </div>
 
-            <!-- Text Compare -->
+            <!-- Spring Boot YAML ↔ Properties -->
+            <div class="tool-panel" id="spring-props">
+                <h2>YAML ↔ Properties</h2>
+
+                <div class="sub-tabs">
+                    <button class="sub-tab-btn active" data-subtab="yaml-to-props">YAML → Properties</button>
+                    <button class="sub-tab-btn" data-subtab="props-to-yaml">Properties → YAML</button>
+                </div>
+
+                <div class="sub-tab-content active" id="yaml-to-props-tab">
+                    <div class="button-group">
+                        <button onclick="convertYAMLtoProps()">Convert</button>
+                        <button onclick="clearInput('yaml-to-props-input', 'yaml-to-props-output')">Clear</button>
+                        <button class="copy-btn" onclick="copyToClipboard('yaml-to-props-output')">Copy result</button>
+                    </div>
+                    <div id="yaml-to-props-validation" class="validation-message"></div>
+                    <div class="tool-content">
+                        <div class="tool-split-view">
+                            <div class="tool-input-panel">
+                                <h3>YAML input</h3>
+                                <textarea id="yaml-to-props-input" placeholder="spring:
+  datasource:
+    url: jdbc:postgresql://localhost/db
+    username: admin
+  jpa:
+    hibernate:
+      ddl-auto: update"></textarea>
+                            </div>
+                            <div class="tool-output-panel">
+                                <h3>Properties output</h3>
+                                <textarea id="yaml-to-props-output" readonly placeholder="spring.datasource.url=..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sub-tab-content" id="props-to-yaml-tab">
+                    <div class="button-group">
+                        <button onclick="convertPropsToYAML()">Convert</button>
+                        <button onclick="clearInput('props-to-yaml-input', 'props-to-yaml-output')">Clear</button>
+                        <button class="copy-btn" onclick="copyToClipboard('props-to-yaml-output')">Copy result</button>
+                    </div>
+                    <div id="props-to-yaml-validation" class="validation-message"></div>
+                    <div class="tool-content">
+                        <div class="tool-split-view">
+                            <div class="tool-input-panel">
+                                <h3>Properties input</h3>
+                                <textarea id="props-to-yaml-input" placeholder="spring.datasource.url=jdbc:postgresql://localhost/db
+spring.datasource.username=admin
+spring.jpa.hibernate.ddl-auto=update"></textarea>
+                            </div>
+                            <div class="tool-output-panel">
+                                <h3>YAML output</h3>
+                                <textarea id="props-to-yaml-output" readonly placeholder="spring:&#10;  datasource:&#10;    url: ..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
             <div class="tool-panel" id="text-compare">
                 <h2>Text Compare</h2>
                 <div class="button-group">
