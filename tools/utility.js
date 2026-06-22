@@ -358,7 +358,15 @@ const HTTP_STATUSES = [
             { code: 428, name: 'Precondition Required',desc: 'The server requires the request to be conditional.' },
             { code: 429, name: 'Too Many Requests',    desc: 'The client has sent too many requests in a given amount of time (rate limiting).' },
             { code: 431, name: 'Headers Too Large',    desc: 'The server is unwilling to process the request because its header fields are too large.' },
+            { code: 444, name: 'No Response',          desc: 'Connection closed with no response sent. Used to deter malicious clients.', vendor: 'nginx' },
             { code: 451, name: 'Unavailable For Legal',desc: 'The resource is unavailable due to a legal demand.' },
+            { code: 460, name: 'Client Closed',        desc: 'Client closed the connection before the load balancer could send a response.', vendor: 'AWS ALB' },
+            { code: 463, name: 'X-Forwarded-For Too Long', desc: 'The X-Forwarded-For header has more than 30 IP addresses.', vendor: 'AWS ALB' },
+            { code: 494, name: 'Request Header Too Large', desc: 'The request headers exceeded the configured buffer size.', vendor: 'nginx' },
+            { code: 495, name: 'SSL Certificate Error',desc: 'Client SSL certificate verification failed.', vendor: 'nginx' },
+            { code: 496, name: 'SSL Certificate Required', desc: 'Client did not provide an SSL certificate when one was required.', vendor: 'nginx' },
+            { code: 497, name: 'HTTP → HTTPS',         desc: 'Plain HTTP request sent to an HTTPS port.', vendor: 'nginx' },
+            { code: 499, name: 'Client Closed Request',desc: 'Client closed the connection before the server finished sending the response.', vendor: 'nginx' },
         ]
     },
     {
@@ -372,32 +380,20 @@ const HTTP_STATUSES = [
             { code: 506, name: 'Variant Also Negotiates', desc: 'Transparent content negotiation results in a circular reference.' },
             { code: 507, name: 'Insufficient Storage', desc: 'The server is unable to store the representation needed (WebDAV).' },
             { code: 508, name: 'Loop Detected',        desc: 'The server detected an infinite loop while processing the request (WebDAV).' },
+            { code: 509, name: 'Bandwidth Limit Exceeded', desc: 'The server has exceeded its bandwidth quota for the period.', vendor: 'Apache/cPanel' },
             { code: 510, name: 'Not Extended',         desc: 'Further extensions to the request are required.' },
             { code: 511, name: 'Network Auth Required',desc: 'The client needs to authenticate to gain network access.' },
-        ]
-    },
-    {
-        group: 'Unofficial / Vendor Extensions', color: '#7A7A7A', codes: [
-            { code: 444, name: 'No Response',              desc: 'nginx: Connection closed with no response sent. Used to deter malicious clients.' },
-            { code: 460, name: 'Client Closed (AWS)',       desc: 'AWS ALB: Client closed the connection before the load balancer could send a response.' },
-            { code: 463, name: 'X-Forwarded-For Too Long', desc: 'AWS ALB: The X-Forwarded-For header has more than 30 IP addresses.' },
-            { code: 494, name: 'Request Header Too Large',  desc: 'nginx: The request headers exceeded the configured buffer size.' },
-            { code: 495, name: 'SSL Certificate Error',     desc: 'nginx: Client SSL certificate verification failed.' },
-            { code: 496, name: 'SSL Certificate Required',  desc: 'nginx: Client did not provide an SSL certificate when one was required.' },
-            { code: 497, name: 'HTTP → HTTPS',              desc: 'nginx: Plain HTTP request sent to an HTTPS port.' },
-            { code: 499, name: 'Client Closed Request',     desc: 'nginx: Client closed the connection before the server finished sending the response.' },
-            { code: 509, name: 'Bandwidth Limit Exceeded',  desc: 'Apache/cPanel: The server has exceeded its bandwidth quota for the period.' },
-            { code: 520, name: 'Web Server Unknown Error',  desc: 'Cloudflare: Origin server returned an unexpected response.' },
-            { code: 521, name: 'Web Server Down',           desc: 'Cloudflare: Origin server refused the connection from Cloudflare.' },
-            { code: 522, name: 'Connection Timed Out',      desc: 'Cloudflare: Cloudflare could not connect to the origin server in time.' },
-            { code: 523, name: 'Origin Unreachable',        desc: 'Cloudflare: Cloudflare cannot reach the origin server.' },
-            { code: 524, name: 'A Timeout Occurred',        desc: 'Cloudflare: Cloudflare connected but the origin did not reply in time.' },
-            { code: 525, name: 'SSL Handshake Failed',      desc: 'Cloudflare: SSL handshake between Cloudflare and the origin server failed.' },
-            { code: 526, name: 'Invalid SSL Certificate',   desc: 'Cloudflare: Origin SSL certificate could not be validated.' },
-            { code: 527, name: 'Railgun Error',             desc: 'Cloudflare: Timeout or error with the Railgun WAN optimisation plugin.' },
-            { code: 530, name: 'Origin DNS Error',          desc: 'Cloudflare: DNS resolution of the origin host failed.' },
-            { code: 598, name: 'Network Read Timeout',      desc: 'Informal convention used by some proxies to signal a network read timeout.' },
-            { code: 599, name: 'Network Connect Timeout',   desc: 'Informal convention used by some proxies to signal a network connect timeout.' },
+            { code: 520, name: 'Web Server Unknown Error', desc: 'Origin server returned an unexpected response.', vendor: 'Cloudflare' },
+            { code: 521, name: 'Web Server Down',      desc: 'Origin server refused the connection.', vendor: 'Cloudflare' },
+            { code: 522, name: 'Connection Timed Out', desc: 'Could not connect to the origin server in time.', vendor: 'Cloudflare' },
+            { code: 523, name: 'Origin Unreachable',   desc: 'Cannot reach the origin server.', vendor: 'Cloudflare' },
+            { code: 524, name: 'A Timeout Occurred',   desc: 'Connected to origin but it did not reply in time.', vendor: 'Cloudflare' },
+            { code: 525, name: 'SSL Handshake Failed', desc: 'SSL handshake between proxy and origin server failed.', vendor: 'Cloudflare' },
+            { code: 526, name: 'Invalid SSL Certificate', desc: 'Origin SSL certificate could not be validated.', vendor: 'Cloudflare' },
+            { code: 527, name: 'Railgun Error',        desc: 'Timeout or error with the Railgun WAN optimisation plugin.', vendor: 'Cloudflare' },
+            { code: 530, name: 'Origin DNS Error',     desc: 'DNS resolution of the origin host failed.', vendor: 'Cloudflare' },
+            { code: 598, name: 'Network Read Timeout', desc: 'Network read timeout behind the proxy.', vendor: 'Proxy' },
+            { code: 599, name: 'Network Connect Timeout', desc: 'Network connect timeout behind the proxy.', vendor: 'Proxy' },
         ]
     },
 ];
@@ -415,15 +411,15 @@ function httpStatusRender(filter = '') {
             !q ||
             String(c.code).includes(q) ||
             c.name.toLowerCase().includes(q) ||
-            c.desc.toLowerCase().includes(q)
+            c.desc.toLowerCase().includes(q) ||
+            (c.vendor && c.vendor.toLowerCase().includes(q))
         );
         if (rows.length === 0) return;
         anyVisible = true;
 
         const isOpen = q || gi === 0;
-        const isUnofficial = group.group.toLowerCase().includes('unofficial');
         html += `
-        <div class="http-status-group${isOpen ? ' open' : ''}${isUnofficial ? ' unofficial' : ''}" id="http-group-${gi}">
+        <div class="http-status-group${isOpen ? ' open' : ''}" id="http-group-${gi}">
             <button class="http-status-group-header" onclick="httpStatusToggle(${gi})">
                 <span class="http-status-group-toggle">▶</span>
                 ${escapeHtml(group.group)}
@@ -431,9 +427,9 @@ function httpStatusRender(filter = '') {
             </button>
             <div class="http-status-rows">
                 ${rows.map(c => `
-                <div class="http-status-row">
-                    <span class="http-status-code" style="color:${group.color}">${c.code}</span>
-                    <span class="http-status-name">${escapeHtml(c.name)}</span>
+                <div class="http-status-row${c.vendor ? ' http-status-row-vendor' : ''}">
+                    <span class="http-status-code" style="color:${c.vendor ? '#7A7A7A' : group.color}">${c.code}</span>
+                    <span class="http-status-name">${escapeHtml(c.name)}${c.vendor ? ` <span class="http-vendor-tag">${escapeHtml(c.vendor)}</span>` : ''}</span>
                     <span class="http-status-desc">${escapeHtml(c.desc)}</span>
                 </div>`).join('')}
             </div>

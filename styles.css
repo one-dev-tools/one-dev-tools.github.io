@@ -1600,15 +1600,6 @@ textarea::placeholder {
     overflow: hidden;
 }
 
-.http-status-group.unofficial {
-    border-style: dashed;
-    opacity: 0.9;
-}
-
-.http-status-group.unofficial .http-status-group-header {
-    font-style: italic;
-}
-
 .http-status-group-header {
     display: flex;
     align-items: center;
@@ -1697,6 +1688,29 @@ textarea::placeholder {
     font-size: 12px;
     color: var(--ink-faint);
     line-height: 1.5;
+}
+
+.http-status-row-vendor {
+    background: var(--surface-alt);
+    border-left: 2px solid #9A9A94;
+}
+
+.http-status-row-vendor:hover {
+    background: var(--rule);
+}
+
+.http-vendor-tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 1px 6px;
+    border-radius: 2px;
+    background: var(--rule);
+    color: var(--ink-mid);
+    margin-left: 6px;
+    vertical-align: middle;
+    letter-spacing: 0.03em;
 }
 
 .http-status-no-results {
