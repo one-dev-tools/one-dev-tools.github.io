@@ -376,6 +376,30 @@ const HTTP_STATUSES = [
             { code: 511, name: 'Network Auth Required',desc: 'The client needs to authenticate to gain network access.' },
         ]
     },
+    {
+        group: 'Unofficial / Vendor Extensions', color: '#7A7A7A', codes: [
+            { code: 444, name: 'No Response',              desc: 'nginx: Connection closed with no response sent. Used to deter malicious clients.' },
+            { code: 460, name: 'Client Closed (AWS)',       desc: 'AWS ALB: Client closed the connection before the load balancer could send a response.' },
+            { code: 463, name: 'X-Forwarded-For Too Long', desc: 'AWS ALB: The X-Forwarded-For header has more than 30 IP addresses.' },
+            { code: 494, name: 'Request Header Too Large',  desc: 'nginx: The request headers exceeded the configured buffer size.' },
+            { code: 495, name: 'SSL Certificate Error',     desc: 'nginx: Client SSL certificate verification failed.' },
+            { code: 496, name: 'SSL Certificate Required',  desc: 'nginx: Client did not provide an SSL certificate when one was required.' },
+            { code: 497, name: 'HTTP → HTTPS',              desc: 'nginx: Plain HTTP request sent to an HTTPS port.' },
+            { code: 499, name: 'Client Closed Request',     desc: 'nginx: Client closed the connection before the server finished sending the response.' },
+            { code: 509, name: 'Bandwidth Limit Exceeded',  desc: 'Apache/cPanel: The server has exceeded its bandwidth quota for the period.' },
+            { code: 520, name: 'Web Server Unknown Error',  desc: 'Cloudflare: Origin server returned an unexpected response.' },
+            { code: 521, name: 'Web Server Down',           desc: 'Cloudflare: Origin server refused the connection from Cloudflare.' },
+            { code: 522, name: 'Connection Timed Out',      desc: 'Cloudflare: Cloudflare could not connect to the origin server in time.' },
+            { code: 523, name: 'Origin Unreachable',        desc: 'Cloudflare: Cloudflare cannot reach the origin server.' },
+            { code: 524, name: 'A Timeout Occurred',        desc: 'Cloudflare: Cloudflare connected but the origin did not reply in time.' },
+            { code: 525, name: 'SSL Handshake Failed',      desc: 'Cloudflare: SSL handshake between Cloudflare and the origin server failed.' },
+            { code: 526, name: 'Invalid SSL Certificate',   desc: 'Cloudflare: Origin SSL certificate could not be validated.' },
+            { code: 527, name: 'Railgun Error',             desc: 'Cloudflare: Timeout or error with the Railgun WAN optimisation plugin.' },
+            { code: 530, name: 'Origin DNS Error',          desc: 'Cloudflare: DNS resolution of the origin host failed.' },
+            { code: 598, name: 'Network Read Timeout',      desc: 'Informal convention used by some proxies to signal a network read timeout.' },
+            { code: 599, name: 'Network Connect Timeout',   desc: 'Informal convention used by some proxies to signal a network connect timeout.' },
+        ]
+    },
 ];
 
 function httpStatusRender(filter = '') {
@@ -396,9 +420,10 @@ function httpStatusRender(filter = '') {
         if (rows.length === 0) return;
         anyVisible = true;
 
-        const isOpen = q || gi === 0; // open by default only first group (or all when searching)
+        const isOpen = q || gi === 0;
+        const isUnofficial = group.group.toLowerCase().includes('unofficial');
         html += `
-        <div class="http-status-group${isOpen ? ' open' : ''}" id="http-group-${gi}">
+        <div class="http-status-group${isOpen ? ' open' : ''}${isUnofficial ? ' unofficial' : ''}" id="http-group-${gi}">
             <button class="http-status-group-header" onclick="httpStatusToggle(${gi})">
                 <span class="http-status-group-toggle">▶</span>
                 ${escapeHtml(group.group)}

@@ -1600,6 +1600,15 @@ textarea::placeholder {
     overflow: hidden;
 }
 
+.http-status-group.unofficial {
+    border-style: dashed;
+    opacity: 0.9;
+}
+
+.http-status-group.unofficial .http-status-group-header {
+    font-style: italic;
+}
+
 .http-status-group-header {
     display: flex;
     align-items: center;
