@@ -323,6 +323,218 @@ body {
 .tool-btn[data-group="personal"].active    { color: var(--g-personal); background: var(--g-personal-dim); border-left-color: var(--g-personal); }
 .tool-btn[data-group="personal"].active .tool-hint { color: var(--g-personal); }
 
+/* ── Pomodoro Timer ──────────────────────────────────────── */
+
+.pomo-modes {
+    display: flex;
+    gap: 10px;
+}
+
+.pomo-mode-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 12px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    box-shadow: none;
+    transform: none;
+}
+
+.pomo-mode-btn:hover {
+    background: var(--g-personal-dim);
+    border-color: var(--g-personal);
+    transform: none;
+    box-shadow: none;
+}
+
+.pomo-mode-btn.active {
+    background: var(--g-personal-dim);
+    border-color: var(--g-personal);
+    border-width: 2px;
+}
+
+.pomo-mode-label {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+}
+
+.pomo-mode-hint {
+    font-size: 11px;
+    color: var(--ink-faint);
+}
+
+.pomo-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+}
+
+.pomo-phase {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--g-personal);
+}
+
+.pomo-phase.break {
+    color: var(--g-generate);
+}
+
+.pomo-time {
+    font-family: var(--font-mono);
+    font-size: 64px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.04em;
+    line-height: 1;
+}
+
+.pomo-session {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+}
+
+.pomo-ring-wrap {
+    display: flex;
+    justify-content: center;
+    margin: -80px 0 -80px; /* overlap the timer display */
+    pointer-events: none;
+}
+
+.pomo-ring {
+    width: 240px;
+    height: 240px;
+    transform: rotate(-90deg);
+    opacity: 0.18;
+}
+
+.pomo-ring-bg {
+    fill: none;
+    stroke: var(--rule);
+    stroke-width: 6;
+}
+
+.pomo-ring-fill {
+    fill: none;
+    stroke: var(--g-personal);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 327;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear, stroke 0.4s;
+}
+
+.pomo-ring-fill.break {
+    stroke: var(--g-generate);
+}
+
+.pomo-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.pomo-btn {
+    padding: 10px 28px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s, border-color 0.12s;
+    box-shadow: none;
+    transform: none;
+}
+
+.pomo-btn:hover {
+    background: var(--surface-alt);
+    transform: none;
+    box-shadow: none;
+}
+
+.pomo-btn-primary {
+    background: var(--g-personal);
+    color: var(--surface);
+    border-color: var(--g-personal);
+    min-width: 100px;
+}
+
+.pomo-btn-primary:hover {
+    background: #8A6A48;
+    border-color: #8A6A48;
+}
+
+.pomo-btn-primary.running {
+    background: var(--error);
+    border-color: var(--error);
+}
+
+.pomo-btn-primary.running:hover {
+    background: #7A2828;
+    border-color: #7A2828;
+}
+
+.pomo-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    min-height: 16px;
+}
+
+.pomo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 1.5px solid var(--rule);
+    background: var(--surface);
+    transition: background 0.3s, border-color 0.3s;
+}
+
+.pomo-dot.done {
+    background: var(--g-personal);
+    border-color: var(--g-personal);
+}
+
+.pomo-dot.current {
+    border-color: var(--g-personal);
+}
+
+.pomo-sound-row {
+    display: flex;
+    justify-content: center;
+}
+
+.pomo-sound-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    cursor: pointer;
+    user-select: none;
+}
+
+.pomo-sound-label input[type="checkbox"] {
+    cursor: pointer;
+}
+
 /* ── To-Do List ──────────────────────────────────────────── */
 
 .todo-input-row {

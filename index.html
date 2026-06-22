@@ -32,6 +32,10 @@
                 <span class="tool-label">To-Do</span>
                 <span class="tool-hint">tasks · local storage</span>
             </button>
+            <button class="tool-btn" data-tool="pomodoro" data-group="personal">
+                <span class="tool-label">Pomodoro</span>
+                <span class="tool-hint">25/5 · 50/10</span>
+            </button>
 
             <div class="nav-group-label">Encode / Decode</div>
             <button class="tool-btn" data-tool="base64" data-group="encode">
@@ -900,6 +904,58 @@ spring.jpa.hibernate.ddl-auto=update"></textarea>
                 </div>
                 <ul class="todo-list" id="todo-items"></ul>
                 <div class="todo-footer" id="todo-footer"></div>
+            </div>
+
+            <!-- Pomodoro Timer -->
+            <div class="tool-panel" id="pomodoro">
+                <h2>Pomodoro Timer</h2>
+                <div class="tool-content">
+
+                    <!-- Mode selector -->
+                    <div class="pomo-modes">
+                        <button class="pomo-mode-btn active" data-work="25" data-break="5" onclick="pomoSelectMode(this)">
+                            <span class="pomo-mode-label">25 / 5</span>
+                            <span class="pomo-mode-hint">Classic Pomodoro</span>
+                        </button>
+                        <button class="pomo-mode-btn" data-work="50" data-break="10" onclick="pomoSelectMode(this)">
+                            <span class="pomo-mode-label">50 / 10</span>
+                            <span class="pomo-mode-hint">Extended Focus</span>
+                        </button>
+                    </div>
+
+                    <!-- Timer display -->
+                    <div class="pomo-display">
+                        <div class="pomo-phase" id="pomo-phase">Work</div>
+                        <div class="pomo-time" id="pomo-time">25:00</div>
+                        <div class="pomo-session" id="pomo-session">Session 1</div>
+                    </div>
+
+                    <!-- Progress ring -->
+                    <div class="pomo-ring-wrap">
+                        <svg class="pomo-ring" viewBox="0 0 120 120">
+                            <circle class="pomo-ring-bg" cx="60" cy="60" r="52"/>
+                            <circle class="pomo-ring-fill" id="pomo-ring-fill" cx="60" cy="60" r="52"/>
+                        </svg>
+                    </div>
+
+                    <!-- Controls -->
+                    <div class="pomo-controls">
+                        <button class="pomo-btn pomo-btn-primary" id="pomo-start-btn" onclick="pomoToggle()">Start</button>
+                        <button class="pomo-btn" onclick="pomoReset()">Reset</button>
+                        <button class="pomo-btn" onclick="pomoSkip()">Skip</button>
+                    </div>
+
+                    <!-- Session dots -->
+                    <div class="pomo-dots" id="pomo-dots"></div>
+
+                    <!-- Sound toggle -->
+                    <div class="pomo-sound-row">
+                        <label class="pomo-sound-label">
+                            <input type="checkbox" id="pomo-sound" checked>
+                            Sound on completion
+                        </label>
+                    </div>
+                </div>
             </div>
 
         </div><!-- /.main-inner -->

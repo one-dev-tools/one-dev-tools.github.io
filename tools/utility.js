@@ -454,6 +454,156 @@ function httpStatusFilter() {
     httpStatusRender(q);
 }
 
+// ── Pomodoro Timer ────────────────────────────────────────
+
+const POMO_SESSIONS = 4; // dots shown per cycle
+
+let pomoState = {
+    workMins:  25,
+    breakMins: 5,
+    secsLeft:  25 * 60,
+    isWork:    true,
+    running:   false,
+    session:   1,
+    timer:     null,
+};
+
+function pomoSelectMode(btn) {
+    document.querySelectorAll('.pomo-mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    pomoState.workMins  = parseInt(btn.dataset.work);
+    pomoState.breakMins = parseInt(btn.dataset.break);
+    pomoReset();
+}
+
+function pomoToggle() {
+    if (pomoState.running) {
+        pomoState.running = false;
+        clearInterval(pomoState.timer);
+        document.getElementById('pomo-start-btn').textContent = 'Resume';
+        document.getElementById('pomo-start-btn').classList.remove('running');
+    } else {
+        pomoState.running = true;
+        document.getElementById('pomo-start-btn').textContent = 'Pause';
+        document.getElementById('pomo-start-btn').classList.add('running');
+        pomoState.timer = setInterval(pomoTick, 1000);
+    }
+}
+
+function pomoTick() {
+    if (pomoState.secsLeft > 0) {
+        pomoState.secsLeft--;
+        pomoUpdateDisplay();
+    } else {
+        // Session complete
+        clearInterval(pomoState.timer);
+        pomoState.running = false;
+        pomoRing();
+
+        if (pomoState.isWork) {
+            // Switch to break
+            pomoState.isWork  = false;
+            pomoState.secsLeft = pomoState.breakMins * 60;
+        } else {
+            // Break done — next work session
+            pomoState.isWork   = true;
+            pomoState.session  = (pomoState.session % POMO_SESSIONS) + 1;
+            pomoState.secsLeft = pomoState.workMins * 60;
+        }
+        pomoUpdateDisplay();
+        // Auto-start next phase
+        document.getElementById('pomo-start-btn').textContent = 'Start';
+        document.getElementById('pomo-start-btn').classList.remove('running');
+    }
+}
+
+function pomoReset() {
+    clearInterval(pomoState.timer);
+    pomoState.running  = false;
+    pomoState.isWork   = true;
+    pomoState.session  = 1;
+    pomoState.secsLeft = pomoState.workMins * 60;
+    const btn = document.getElementById('pomo-start-btn');
+    if (btn) { btn.textContent = 'Start'; btn.classList.remove('running'); }
+    pomoUpdateDisplay();
+}
+
+function pomoSkip() {
+    clearInterval(pomoState.timer);
+    pomoState.running = false;
+    pomoState.secsLeft = 0;
+    const btn = document.getElementById('pomo-start-btn');
+    if (btn) { btn.textContent = 'Start'; btn.classList.remove('running'); }
+    pomoTick(); // trigger the phase transition
+}
+
+function pomoUpdateDisplay() {
+    const mins = Math.floor(pomoState.secsLeft / 60).toString().padStart(2, '0');
+    const secs = (pomoState.secsLeft % 60).toString().padStart(2, '0');
+
+    const timeEl    = document.getElementById('pomo-time');
+    const phaseEl   = document.getElementById('pomo-phase');
+    const sessionEl = document.getElementById('pomo-session');
+    const ringFill  = document.getElementById('pomo-ring-fill');
+    const dotsEl    = document.getElementById('pomo-dots');
+    if (!timeEl) return;
+
+    timeEl.textContent    = `${mins}:${secs}`;
+    phaseEl.textContent   = pomoState.isWork ? 'Work' : 'Break';
+    phaseEl.className     = 'pomo-phase' + (pomoState.isWork ? '' : ' break');
+    sessionEl.textContent = `Session ${pomoState.session} of ${POMO_SESSIONS}`;
+
+    // Progress ring: circumference = 2π×52 ≈ 327
+    const total    = (pomoState.isWork ? pomoState.workMins : pomoState.breakMins) * 60;
+    const progress = pomoState.secsLeft / total;
+    ringFill.style.strokeDashoffset = 327 * progress;
+    ringFill.className = 'pomo-ring-fill' + (pomoState.isWork ? '' : ' break');
+
+    // Session dots
+    let dotsHtml = '';
+    for (let i = 1; i <= POMO_SESSIONS; i++) {
+        const done    = i < pomoState.session || (!pomoState.isWork && i === pomoState.session);
+        const current = i === pomoState.session && pomoState.isWork;
+        dotsHtml += `<div class="pomo-dot${done ? ' done' : ''}${current ? ' current' : ''}"></div>`;
+    }
+    dotsEl.innerHTML = dotsHtml;
+}
+
+function pomoRing() {
+    if (!document.getElementById('pomo-sound')?.checked) return;
+
+    // Generate a pleasant two-tone chime using Web Audio API
+    try {
+        const ctx  = new (window.AudioContext || window.webkitAudioContext)();
+        const play = (freq, startAt, dur) => {
+            const osc  = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.type      = 'sine';
+            osc.frequency.setValueAtTime(freq, ctx.currentTime + startAt);
+            gain.gain.setValueAtTime(0.4, ctx.currentTime + startAt);
+            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + startAt + dur);
+            osc.start(ctx.currentTime + startAt);
+            osc.stop(ctx.currentTime + startAt + dur);
+        };
+        play(660, 0,    0.4);
+        play(880, 0.45, 0.5);
+    } catch (e) {
+        // Audio not available — silently skip
+    }
+}
+
+// Initialise display when panel is activated
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+        if (btn.getAttribute('data-tool') === 'pomodoro') {
+            btn.addEventListener('click', pomoUpdateDisplay);
+        }
+    });
+    pomoUpdateDisplay();
+});
+
 // ── To-Do List ────────────────────────────────────────────
 
 const TODO_KEY = 'onedevtools_todos';
