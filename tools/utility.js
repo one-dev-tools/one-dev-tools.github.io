@@ -37,6 +37,7 @@ function compareTexts() {
     if (added === 0 && removed === 0) {
         summaryEl.innerHTML = '';
         outputEl.innerHTML  = linesA.map((line, i) => diffLineHTML('identical', i+1, i+1, line)).join('');
+        outputEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
     }
 
@@ -63,6 +64,7 @@ function compareTexts() {
         else                       { html += diffLineHTML('added',    '',    lineB, d.text); lineB++; }
     });
     outputEl.innerHTML = html;
+    outputEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function clearCompare() {
