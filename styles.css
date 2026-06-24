@@ -2180,9 +2180,13 @@ mark.regex-hl {
 }
 
 #text-compare .tool-split-view textarea {
-    min-height: 75vh;
-    height: 75vh;
-    max-height: 75vh;
+    min-height: 60vh;
+    height: 60vh;
+    max-height: 60vh;
+}
+
+#text-compare .diff-output {
+    margin-bottom: 32px;
 }
 
 .diff-summary {
