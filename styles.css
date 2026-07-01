@@ -1053,6 +1053,14 @@ textarea::placeholder {
 
 /* ── JSON Snapshots ──────────────────────────────────────── */
 
+#format-tab {
+    flex: none;
+}
+
+#format-tab .tool-content {
+    flex: none;
+}
+
 .json-snapshots {
     display: flex;
     flex-direction: column;
