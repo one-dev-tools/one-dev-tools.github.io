@@ -1,17 +1,59 @@
 // ── JSON Formatter & Visualizer ───────────────────────────
 
+let jsonSnapshotCount = 0;
+
 function formatJSON() {
     const input      = document.getElementById('json-input').value;
     const indent     = parseInt(document.getElementById('json-indent').value) || 2;
     const validation = document.getElementById('json-validation');
     try {
-        document.getElementById('json-output').value = JSON.stringify(JSON.parse(input), null, indent);
+        const formatted = JSON.stringify(JSON.parse(input), null, indent);
+        document.getElementById('json-output').value = formatted;
         validation.textContent = '✓ Valid JSON';
         validation.className   = 'validation-message success';
+        jsonAddSnapshot(formatted);
     } catch (e) {
         validation.textContent = '✗ Invalid JSON: ' + e.message;
         validation.className   = 'validation-message error';
     }
+}
+
+function jsonAddSnapshot(formatted) {
+    const container = document.getElementById('json-snapshots');
+    if (!container) return;
+
+    jsonSnapshotCount++;
+    const id  = `json-snap-${Date.now()}`;
+    const now = new Date().toLocaleTimeString(navigator.language || 'en-US', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    const lines = formatted.split('\n').length;
+
+    const card = document.createElement('div');
+    card.className = 'json-snapshot';
+    card.id = id;
+    card.innerHTML = `
+        <div class="json-snapshot-header">
+            <span class="json-snapshot-title">#${jsonSnapshotCount} &nbsp;·&nbsp; ${now} &nbsp;·&nbsp; ${lines} line${lines !== 1 ? 's' : ''}</span>
+            <button class="json-snapshot-copy" onclick="jsonCopySnapshot('${id}')">Copy</button>
+            <button class="json-snapshot-close" title="Close" onclick="document.getElementById('${id}').remove()">×</button>
+        </div>
+        <pre class="json-snapshot-body">${escapeSnapshotHtml(formatted)}</pre>`;
+
+    // Prepend so newest is on top
+    container.insertBefore(card, container.firstChild);
+}
+
+function jsonCopySnapshot(id) {
+    const pre = document.querySelector(`#${id} .json-snapshot-body`);
+    if (!pre) return;
+    navigator.clipboard.writeText(pre.textContent)
+        .then(() => showNotification('Copied to clipboard!', 'success'))
+        .catch(() => showNotification('Failed to copy', 'error'));
+}
+
+function escapeSnapshotHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function minifyJSON() {
